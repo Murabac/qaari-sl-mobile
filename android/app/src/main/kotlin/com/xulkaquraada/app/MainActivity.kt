@@ -1,4 +1,4 @@
-package com.murabac.qaari_sl_mobile
+package com.xulkaquraada.app
 
 import com.ryanheise.audioservice.AudioServiceActivity
 

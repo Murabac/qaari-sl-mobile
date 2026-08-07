@@ -15,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.murabac.qaari_sl_mobile"
+    namespace = "com.xulkaquraada.app"
     // flutter_secure_storage requires compileSdk 37+
     compileSdk = 37
     ndkVersion = flutter.ndkVersion
@@ -30,7 +30,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.murabac.qaari_sl_mobile"
+        applicationId = "com.xulkaquraada.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
