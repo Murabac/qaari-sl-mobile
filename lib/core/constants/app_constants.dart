@@ -36,4 +36,9 @@ class AppConstants {
 
   static String listenUrl(int recitationId) =>
       '$resolvedWebBaseUrl/listen/$recitationId';
+
+  static String get accountDeletionUrl =>
+      '${resolvedWebBaseUrl}/account-deletion';
+
+  static String get privacyPolicyUrl => '${resolvedWebBaseUrl}/privacy';
 }

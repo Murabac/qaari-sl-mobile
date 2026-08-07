@@ -76,6 +76,14 @@ class AuthRepository {
     }
   }
 
+  Future<void> deleteAccount({required String password}) async {
+    await _dio.delete<Map<String, dynamic>>(
+      '/auth/account',
+      data: {'password': password},
+    );
+    await _tokenStore.clear();
+  }
+
   Future<void> clearLocalSession() => _tokenStore.clear();
 
   Future<AuthSession> _persistSession(Map<String, dynamic>? body) async {

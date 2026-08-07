@@ -123,11 +123,27 @@ class AuthController extends StateNotifier<AuthState> {
     state = const AuthState(status: AuthStatus.guest);
   }
 
+  Future<bool> deleteAccount({required String password}) async {
+    state = state.copyWith(clearError: true);
+    try {
+      await _repo.deleteAccount(password: password);
+      state = const AuthState(status: AuthStatus.guest);
+      return true;
+    } catch (error) {
+      state = state.copyWith(error: _friendlyDelete(error));
+      return false;
+    }
+  }
+
   void handleUnauthorized() {
     state = const AuthState(status: AuthStatus.guest);
   }
 
   String _friendly(Object error) {
     return 'Could not sign in. Check your email and password.';
+  }
+
+  String _friendlyDelete(Object error) {
+    return 'Could not delete account. Check your password and try again.';
   }
 }

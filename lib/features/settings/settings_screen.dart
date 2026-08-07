@@ -8,6 +8,7 @@ import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/about/about_screen.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -98,6 +99,17 @@ class SettingsScreen extends ConsumerWidget {
                         title: 'Sign Out',
                         onTap: () =>
                             ref.read(authControllerProvider.notifier).logout(),
+                        showDivider: true,
+                      ),
+                      _SettingsTile(
+                        leading: const Icon(
+                          Icons.delete_forever_rounded,
+                          color: Colors.redAccent,
+                          size: 18,
+                        ),
+                        title: 'Delete account',
+                        subtitle: 'Permanently remove your data',
+                        onTap: () => _confirmDeleteAccount(context, ref),
                       ),
                     ] else
                       _SettingsTile(
@@ -119,6 +131,42 @@ class SettingsScreen extends ConsumerWidget {
                           ),
                         ),
                       ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const _SectionLabel('PRIVACY'),
+                _GroupedCard(
+                  children: [
+                    _SettingsTile(
+                      leading: const Icon(
+                        Icons.privacy_tip_outlined,
+                        color: AppColors.gold,
+                        size: 18,
+                      ),
+                      title: 'Privacy policy',
+                      trailing: const Icon(
+                        Icons.open_in_new_rounded,
+                        color: AppColors.gold,
+                        size: 16,
+                      ),
+                      showDivider: true,
+                      onTap: () => _openUrl(AppConstants.privacyPolicyUrl),
+                    ),
+                    _SettingsTile(
+                      leading: const Icon(
+                        Icons.person_off_outlined,
+                        color: AppColors.gold,
+                        size: 18,
+                      ),
+                      title: 'Delete account (web)',
+                      subtitle: 'Request deletion in the browser',
+                      trailing: const Icon(
+                        Icons.open_in_new_rounded,
+                        color: AppColors.gold,
+                        size: 16,
+                      ),
+                      onTap: () => _openUrl(AppConstants.accountDeletionUrl),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -206,6 +254,76 @@ class SettingsScreen extends ConsumerWidget {
       ],
     );
   }
+}
+
+Future<void> _openUrl(String url) async {
+  final uri = Uri.parse(url);
+  await launchUrl(uri, mode: LaunchMode.externalApplication);
+}
+
+Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
+  final passwordController = TextEditingController();
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Delete account?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'This permanently deletes your account, favorites, and playlists.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Confirm password',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+
+  if (confirmed != true || !context.mounted) {
+    passwordController.dispose();
+    return;
+  }
+
+  final ok = await ref.read(authControllerProvider.notifier).deleteAccount(
+        password: passwordController.text,
+      );
+  passwordController.dispose();
+
+  if (!context.mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        ok
+            ? 'Your account has been deleted.'
+            : (ref.read(authControllerProvider).error ??
+                'Could not delete account.'),
+      ),
+    ),
+  );
 }
 
 class _SectionLabel extends StatelessWidget {
