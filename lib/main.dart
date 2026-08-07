@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/app/app.dart';
+import 'package:qaari_sl_mobile/features/player/audio_handler.dart';
+import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ProviderScope(child: QaariSlApp()));
+
+  final audioHandler = await initAudioService();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        audioHandlerProvider.overrideWithValue(audioHandler),
+      ],
+      child: const QaariSlApp(),
+    ),
+  );
 }

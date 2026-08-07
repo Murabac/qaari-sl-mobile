@@ -1,5 +1,5 @@
 name: qaari_sl_mobile
-description: Qaari SL — Somaliland Quran reciters mobile app.
+description: Qaari SL — Somali community Quran reciters mobile app.
 publish_to: "none"
 
 version: 1.0.0+1
@@ -17,6 +17,15 @@ dependencies:
   flutter_riverpod: ^2.6.1
   flutter_svg: ^2.2.0
   google_fonts: ^6.2.1
+  dio: ^5.8.0+1
+  just_audio: ^0.10.4
+  audio_service: ^0.18.18
+  audio_session: ^0.1.25
+  cached_network_image: ^3.4.1
+  intl: ^0.20.2
+  flutter_secure_storage: ^11.0.0
+  shared_preferences: ^2.5.5
+  share_plus: ^13.3.0
 
 dev_dependencies:
   flutter_test:

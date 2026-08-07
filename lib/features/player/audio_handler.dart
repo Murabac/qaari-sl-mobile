@@ -1,0 +1,117 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
+import 'package:qaari_sl_mobile/core/models/recitation.dart';
+
+Future<QaariAudioHandler> initAudioService() {
+  return AudioService.init(
+    builder: QaariAudioHandler.new,
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'com.murabac.qaari_sl_mobile.audio',
+      androidNotificationChannelName: 'Xulka Quraada Playback',
+      androidNotificationOngoing: true,
+      androidStopForegroundOnPause: true,
+    ),
+  );
+}
+
+class QaariAudioHandler extends BaseAudioHandler with SeekHandler {
+  QaariAudioHandler() {
+    _player.playbackEventStream.listen((event) {
+      playbackState.add(_transformState());
+    });
+    _player.processingStateStream.listen((state) {
+      if (state == ProcessingState.completed) {
+        pause();
+        seek(Duration.zero);
+      }
+    });
+  }
+
+  final AudioPlayer _player = AudioPlayer();
+  Recitation? _current;
+
+  Recitation? get current => _current;
+  AudioPlayer get player => _player;
+
+  Stream<Duration> get positionStream => _player.positionStream;
+  Stream<Duration?> get durationStream => _player.durationStream;
+  Stream<PlayerState> get playerStateStream => _player.playerStateStream;
+
+  Future<void> playRecitation(Recitation track) async {
+    final same = _current?.id == track.id && _player.audioSource != null;
+    _current = track;
+
+    mediaItem.add(
+      MediaItem(
+        id: '${track.id}',
+        title: track.surah?.titleLine ?? 'Surah ${track.surahId}',
+        artist: track.reciterName ?? AppConstants.appName,
+        duration: Duration(seconds: track.duration),
+        artUri: (track.reciterPhotoUrl ?? '').isNotEmpty
+            ? Uri.tryParse(track.reciterPhotoUrl!)
+            : null,
+      ),
+    );
+
+    if (!same) {
+      await _player.setUrl(track.audioUrl);
+    }
+
+    await play();
+  }
+
+  Future<void> replaceUrlAndResume(String url, {Duration? position}) async {
+    final wasPlaying = _player.playing;
+    await _player.setUrl(url);
+    if (position != null) {
+      await _player.seek(position);
+    }
+    if (wasPlaying) {
+      await play();
+    }
+  }
+
+  @override
+  Future<void> play() => _player.play();
+
+  @override
+  Future<void> pause() => _player.pause();
+
+  @override
+  Future<void> stop() async {
+    await _player.stop();
+    await super.stop();
+  }
+
+  @override
+  Future<void> seek(Duration position) => _player.seek(position);
+
+  PlaybackState _transformState() {
+    return PlaybackState(
+      controls: [
+        MediaControl.rewind,
+        if (_player.playing) MediaControl.pause else MediaControl.play,
+        MediaControl.stop,
+      ],
+      systemActions: const {
+        MediaAction.seek,
+        MediaAction.seekForward,
+        MediaAction.seekBackward,
+      },
+      androidCompactActionIndices: const [0, 1, 2],
+      processingState: const {
+        ProcessingState.idle: AudioProcessingState.idle,
+        ProcessingState.loading: AudioProcessingState.loading,
+        ProcessingState.buffering: AudioProcessingState.buffering,
+        ProcessingState.ready: AudioProcessingState.ready,
+        ProcessingState.completed: AudioProcessingState.completed,
+      }[_player.processingState]!,
+      playing: _player.playing,
+      updatePosition: _player.position,
+      bufferedPosition: _player.bufferedPosition,
+      speed: _player.speed,
+      queueIndex: 0,
+    );
+  }
+}
