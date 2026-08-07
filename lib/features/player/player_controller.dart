@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:qaari_sl_mobile/core/data/catalog_repository.dart';
 import 'package:qaari_sl_mobile/core/models/recitation.dart';
 import 'package:qaari_sl_mobile/features/player/audio_handler.dart';
@@ -21,6 +22,8 @@ final playerControllerProvider =
 class PlayerViewState {
   const PlayerViewState({
     this.current,
+    this.queue = const [],
+    this.queueIndex = -1,
     this.isPlaying = false,
     this.position = Duration.zero,
     this.duration = Duration.zero,
@@ -28,15 +31,21 @@ class PlayerViewState {
   });
 
   final Recitation? current;
+  final List<Recitation> queue;
+  final int queueIndex;
   final bool isPlaying;
   final Duration position;
   final Duration duration;
   final String? error;
 
   bool get hasTrack => current != null;
+  bool get hasPrevious => queueIndex > 0;
+  bool get hasNext => queueIndex >= 0 && queueIndex < queue.length - 1;
 
   PlayerViewState copyWith({
     Recitation? current,
+    List<Recitation>? queue,
+    int? queueIndex,
     bool? isPlaying,
     Duration? position,
     Duration? duration,
@@ -45,6 +54,8 @@ class PlayerViewState {
   }) {
     return PlayerViewState(
       current: current ?? this.current,
+      queue: queue ?? this.queue,
+      queueIndex: queueIndex ?? this.queueIndex,
       isPlaying: isPlaying ?? this.isPlaying,
       position: position ?? this.position,
       duration: duration ?? this.duration,
@@ -80,21 +91,37 @@ class PlayerController extends StateNotifier<PlayerViewState> {
         }
       }),
     );
+    _subs.add(
+      _handler.processingStateStream.listen((processingState) {
+        if (processingState == ProcessingState.completed) {
+          unawaited(playNext(auto: true));
+        }
+      }),
+    );
   }
 
   final QaariAudioHandler _handler;
   final CatalogRepository _catalog;
   final List<StreamSubscription<dynamic>> _subs = [];
 
-  Future<void> playRecitation(Recitation track) async {
+  Future<void> playRecitation(
+    Recitation track, {
+    List<Recitation>? queue,
+  }) async {
+    final resolvedQueue = (queue == null || queue.isEmpty)
+        ? <Recitation>[track]
+        : List<Recitation>.from(queue);
+    final index = resolvedQueue.indexWhere((item) => item.id == track.id);
+
     try {
-      if (state.current?.id == track.id && state.isPlaying) {
+      if (state.current?.id == track.id && state.isPlaying && queue == null) {
         await pause();
         return;
       }
-      // Show track in UI immediately while audio buffers.
       state = state.copyWith(
         current: track,
+        queue: resolvedQueue,
+        queueIndex: index >= 0 ? index : 0,
         isPlaying: true,
         duration: Duration(seconds: track.duration),
         clearError: true,
@@ -112,6 +139,24 @@ class PlayerController extends StateNotifier<PlayerViewState> {
         state = state.copyWith(error: _friendlyError(error));
       }
     }
+  }
+
+  Future<void> playPrevious() async {
+    if (!state.hasPrevious) return;
+    final previous = state.queue[state.queueIndex - 1];
+    await playRecitation(previous, queue: state.queue);
+  }
+
+  Future<void> playNext({bool auto = false}) async {
+    if (!state.hasNext) {
+      if (auto) {
+        await _handler.seek(Duration.zero);
+        await pause();
+      }
+      return;
+    }
+    final next = state.queue[state.queueIndex + 1];
+    await playRecitation(next, queue: state.queue);
   }
 
   Future<bool> _retryWithFreshUrl(Recitation track) async {

@@ -20,12 +20,6 @@ class QaariAudioHandler extends BaseAudioHandler with SeekHandler {
     _player.playbackEventStream.listen((event) {
       playbackState.add(_transformState());
     });
-    _player.processingStateStream.listen((state) {
-      if (state == ProcessingState.completed) {
-        pause();
-        seek(Duration.zero);
-      }
-    });
   }
 
   final AudioPlayer _player = AudioPlayer();
@@ -37,6 +31,8 @@ class QaariAudioHandler extends BaseAudioHandler with SeekHandler {
   Stream<Duration> get positionStream => _player.positionStream;
   Stream<Duration?> get durationStream => _player.durationStream;
   Stream<PlayerState> get playerStateStream => _player.playerStateStream;
+  Stream<ProcessingState> get processingStateStream =>
+      _player.processingStateStream;
 
   Future<void> playRecitation(Recitation track) async {
     final same = _current?.id == track.id && _player.audioSource != null;

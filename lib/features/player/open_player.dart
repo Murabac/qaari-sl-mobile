@@ -10,11 +10,13 @@ import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 void openPlayerAndPlay(
   BuildContext context,
   WidgetRef ref,
-  Recitation track,
-) {
-  // Start play first so `current` is set before the route builds.
-  final playing =
-      ref.read(playerControllerProvider.notifier).playRecitation(track);
+  Recitation track, {
+  List<Recitation>? queue,
+}) {
+  final playing = ref.read(playerControllerProvider.notifier).playRecitation(
+        track,
+        queue: queue,
+      );
   Navigator.of(context).push(
     MaterialPageRoute<void>(builder: (_) => const NowPlayingScreen()),
   );

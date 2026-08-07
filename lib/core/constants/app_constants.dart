@@ -5,18 +5,18 @@ class AppConstants {
   static const String appName = 'Xulka Quraada';
   static const String logoAsset = 'assets/images/logo.svg';
 
-  /// Override with `--dart-define=API_BASE_URL=http://...`
-  /// Android emulator default reaches the host machine's localhost:8000.
+  /// Override for local/dev: `--dart-define=API_BASE_URL=http://10.0.2.2:8000`
+  /// Production APKs use the live API by default.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:8000',
+    defaultValue: 'https://qaari.mahaysaa.com',
   );
 
   /// Public website origin for share links (`/listen/{id}`).
   /// Defaults to the same host as [apiBaseUrl] (no `/api` path).
   static const String webBaseUrl = String.fromEnvironment(
     'WEB_BASE_URL',
-    defaultValue: '',
+    defaultValue: 'https://qaari.mahaysaa.com',
   );
 
   static const String apiPrefix = '/api/v1';

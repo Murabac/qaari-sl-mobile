@@ -189,17 +189,27 @@ class ReciterDetailScreen extends ConsumerWidget {
               else
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
-                  sliver: SliverList.separated(
-                    itemCount: reciter.recitations.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      final track = reciter.recitations[index].copyWith(
-                        reciterName: name,
-                        reciterPhotoUrl: reciter.photoUrl,
-                      );
-                      return _SurahRow(
-                        track: track,
-                        languageCode: languageCode,
+                  sliver: Builder(
+                    builder: (context) {
+                      final queue = reciter.recitations
+                          .map(
+                            (track) => track.copyWith(
+                              reciterName: name,
+                              reciterPhotoUrl: reciter.photoUrl,
+                            ),
+                          )
+                          .toList();
+
+                      return SliverList.separated(
+                        itemCount: queue.length,
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          return _SurahRow(
+                            track: queue[index],
+                            queue: queue,
+                            languageCode: languageCode,
+                          );
+                        },
                       );
                     },
                   ),
@@ -274,10 +284,12 @@ class _CircleIconButton extends StatelessWidget {
 class _SurahRow extends ConsumerWidget {
   const _SurahRow({
     required this.track,
+    required this.queue,
     required this.languageCode,
   });
 
   final Recitation track;
+  final List<Recitation> queue;
   final String languageCode;
 
   @override
@@ -302,7 +314,7 @@ class _SurahRow extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: () => openPlayerAndPlay(context, ref, track),
+          onTap: () => openPlayerAndPlay(context, ref, track, queue: queue),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
             child: Row(
@@ -397,7 +409,7 @@ class _SurahRow extends ConsumerWidget {
                       ref.read(playerControllerProvider.notifier).toggle();
                       return;
                     }
-                    openPlayerAndPlay(context, ref, track);
+                    openPlayerAndPlay(context, ref, track, queue: queue);
                   },
                   style: IconButton.styleFrom(
                     backgroundColor: AppColors.forest,

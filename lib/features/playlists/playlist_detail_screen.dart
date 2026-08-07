@@ -114,7 +114,14 @@ class PlaylistDetailScreen extends ConsumerWidget {
                       ref.invalidate(playlistsProvider);
                     },
                   ),
-                  onTap: () => openPlayerAndPlay(context, ref, track),
+                  onTap: () => openPlayerAndPlay(
+                        context,
+                        ref,
+                        track,
+                        queue: items
+                            .map((item) => item.recitation!)
+                            .toList(),
+                      ),
                 ),
               );
             },

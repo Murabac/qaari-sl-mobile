@@ -36,11 +36,18 @@ flutter run --dart-define=API_BASE_URL=http://10.172.77.244:8000
 
 Hot reload does **not** apply a new `--dart-define` — stop and re-run.
 
+### Production API (default)
+
+Default `API_BASE_URL` / `WEB_BASE_URL` is `https://qaari.mahaysaa.com`. Release APK:
+
+```bash
+cd qaari-sl-mobile
+flutter build apk --release
+```
+
 ### Same Wi‑Fi instead
 
 Phone and PC on the same Wi‑Fi: use the PC’s **Wi‑Fi** IPv4 from `ipconfig`, same `artisan serve --host=0.0.0.0` command.
-
-The default `http://10.0.2.2:8000` only works inside the Android emulator.
 
 ## Auth
 

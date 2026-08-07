@@ -145,8 +145,12 @@ class FavoritesScreen extends ConsumerWidget {
                                     backgroundColor: AppColors.forest,
                                     foregroundColor: AppColors.gold,
                                   ),
-                                  onPressed: () =>
-                                      openPlayerAndPlay(context, ref, track),
+                                  onPressed: () => openPlayerAndPlay(
+                                        context,
+                                        ref,
+                                        track,
+                                        queue: favorites.tracks,
+                                      ),
                                   icon: const Icon(
                                     Icons.play_arrow_rounded,
                                     size: 18,

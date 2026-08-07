@@ -299,13 +299,8 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.shuffle_rounded,
-                            color: AppColors.cream.withValues(alpha: 0.5),
-                            size: 20,
-                          ),
                           _RoundCtrl(
-                            icon: Icons.skip_previous_rounded,
+                            icon: Icons.replay_10_rounded,
                             onTap: () {
                               final next = player.position -
                                   const Duration(seconds: 10);
@@ -315,6 +310,15 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
                                         : next,
                                   );
                             },
+                          ),
+                          _RoundCtrl(
+                            icon: Icons.skip_previous_rounded,
+                            dimmed: !player.hasPrevious,
+                            onTap: player.hasPrevious
+                                ? () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .playPrevious()
+                                : null,
                           ),
                           GestureDetector(
                             onTap: () => ref
@@ -346,6 +350,15 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
                           ),
                           _RoundCtrl(
                             icon: Icons.skip_next_rounded,
+                            dimmed: !player.hasNext,
+                            onTap: player.hasNext
+                                ? () => ref
+                                    .read(playerControllerProvider.notifier)
+                                    .playNext()
+                                : null,
+                          ),
+                          _RoundCtrl(
+                            icon: Icons.forward_10_rounded,
                             onTap: () {
                               final next = player.position +
                                   const Duration(seconds: 10);
@@ -354,11 +367,6 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
                                     next > max ? max : next,
                                   );
                             },
-                          ),
-                          Icon(
-                            Icons.repeat_rounded,
-                            color: AppColors.cream.withValues(alpha: 0.5),
-                            size: 20,
                           ),
                         ],
                       ),
@@ -391,23 +399,31 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
 }
 
 class _RoundCtrl extends StatelessWidget {
-  const _RoundCtrl({required this.icon, required this.onTap});
+  const _RoundCtrl({
+    required this.icon,
+    required this.onTap,
+    this.dimmed = false,
+  });
 
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool dimmed;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.cream.withValues(alpha: 0.1),
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: SizedBox(
-          width: 46,
-          height: 46,
-          child: Icon(icon, color: AppColors.cream, size: 22),
+    return Opacity(
+      opacity: dimmed ? 0.35 : 1,
+      child: Material(
+        color: AppColors.cream.withValues(alpha: 0.1),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: SizedBox(
+            width: 46,
+            height: 46,
+            child: Icon(icon, color: AppColors.cream, size: 22),
+          ),
         ),
       ),
     );
