@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/locale/locale_controller.dart';
@@ -7,27 +8,46 @@ import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/about/about_screen.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
+import 'package:qaari_sl_mobile/features/downloads/downloads_screen.dart';
+import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  String _versionLabel = '';
+
+  @override
+  void initState() {
+    super.initState();
+    PackageInfo.fromPlatform().then((info) {
+      if (!mounted) return;
+      setState(() => _versionLabel = 'v${info.version}');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
     final locale = ref.watch(localeControllerProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
-        const ForestPageHeader(title: 'Settings'),
+        ForestPageHeader(title: l10n.settings),
         Expanded(
           child: ColoredBox(
             color: AppColors.cream,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
               children: [
-                const _SectionLabel('LANGUAGE'),
+                _SectionLabel(l10n.language),
                 _GroupedCard(
                   children: [
                     for (final option in _languages)
@@ -63,7 +83,7 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const _SectionLabel('ACCOUNT'),
+                _SectionLabel(l10n.account),
                 _GroupedCard(
                   children: [
                     if (auth.isAuthenticated && auth.user != null) ...[
@@ -96,7 +116,7 @@ class SettingsScreen extends ConsumerWidget {
                           color: AppColors.gold,
                           size: 18,
                         ),
-                        title: 'Sign Out',
+                        title: l10n.signOut,
                         onTap: () =>
                             ref.read(authControllerProvider.notifier).logout(),
                         showDivider: true,
@@ -107,7 +127,7 @@ class SettingsScreen extends ConsumerWidget {
                           color: Colors.redAccent,
                           size: 18,
                         ),
-                        title: 'Delete account',
+                        title: l10n.deleteAccount,
                         subtitle: 'Permanently remove your data',
                         onTap: () => _confirmDeleteAccount(context, ref),
                       ),
@@ -118,7 +138,7 @@ class SettingsScreen extends ConsumerWidget {
                           color: AppColors.gold,
                           size: 18,
                         ),
-                        title: 'Sign In / Register',
+                        title: l10n.signInRegister,
                         subtitle: 'Save favorites across devices',
                         trailing: const Icon(
                           Icons.chevron_right_rounded,
@@ -134,7 +154,32 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const _SectionLabel('PRIVACY'),
+                _SectionLabel(l10n.downloads),
+                _GroupedCard(
+                  children: [
+                    _SettingsTile(
+                      leading: const Icon(
+                        Icons.download_rounded,
+                        color: AppColors.gold,
+                        size: 18,
+                      ),
+                      title: l10n.offlineDownloads,
+                      subtitle: l10n.manageDownloadedAudio,
+                      trailing: const Icon(
+                        Icons.chevron_right_rounded,
+                        color: AppColors.gold,
+                        size: 18,
+                      ),
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const DownloadsScreen(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _SectionLabel(l10n.privacy),
                 _GroupedCard(
                   children: [
                     _SettingsTile(
@@ -143,7 +188,7 @@ class SettingsScreen extends ConsumerWidget {
                         color: AppColors.gold,
                         size: 18,
                       ),
-                      title: 'Privacy policy',
+                      title: l10n.privacyPolicy,
                       trailing: const Icon(
                         Icons.open_in_new_rounded,
                         color: AppColors.gold,
@@ -170,7 +215,7 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const _SectionLabel('ABOUT'),
+                _SectionLabel(l10n.about),
                 _GroupedCard(
                   children: [
                     _SettingsTile(
@@ -197,23 +242,15 @@ class SettingsScreen extends ConsumerWidget {
                         color: AppColors.gold,
                         size: 18,
                       ),
-                      title: 'Rate the App',
+                      title: l10n.rateTheApp,
                       subtitle: 'Share your feedback',
                       trailing: const Icon(
-                        Icons.chevron_right_rounded,
+                        Icons.open_in_new_rounded,
                         color: AppColors.gold,
-                        size: 18,
+                        size: 16,
                       ),
                       showDivider: true,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Ratings will be available after store release.',
-                            ),
-                          ),
-                        );
-                      },
+                      onTap: () => _openUrl(AppConstants.playStoreUrl),
                     ),
                     _SettingsTile(
                       leading: const Icon(
@@ -240,7 +277,7 @@ class SettingsScreen extends ConsumerWidget {
                 const Center(child: QaariLogo(size: 36)),
                 const SizedBox(height: 6),
                 Text(
-                  '${AppConstants.appName} v1.0.0 · For the Somali community',
+                  '${AppConstants.appName} ${_versionLabel.isEmpty ? '' : '$_versionLabel '}· ${l10n.forSomaliCommunity}',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: AppColors.muted,

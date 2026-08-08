@@ -41,4 +41,8 @@ class AppConstants {
       '${resolvedWebBaseUrl}/account-deletion';
 
   static String get privacyPolicyUrl => '${resolvedWebBaseUrl}/privacy';
+
+  /// Google Play listing (package `com.xulkaquraada.app`).
+  static const String playStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.xulkaquraada.app';
 }

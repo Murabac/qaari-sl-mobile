@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:qaari_sl_mobile/core/data/catalog_repository.dart';
 import 'package:qaari_sl_mobile/core/models/recitation.dart';
+import 'package:qaari_sl_mobile/features/downloads/offline_download_service.dart';
 import 'package:qaari_sl_mobile/features/player/audio_handler.dart';
 
 final audioHandlerProvider = Provider<QaariAudioHandler>((ref) {
@@ -16,6 +17,7 @@ final playerControllerProvider =
   return PlayerController(
     handler: ref.watch(audioHandlerProvider),
     catalog: ref.watch(catalogRepositoryProvider),
+    offline: ref.watch(offlineDownloadServiceProvider),
   );
 });
 
@@ -68,8 +70,10 @@ class PlayerController extends StateNotifier<PlayerViewState> {
   PlayerController({
     required QaariAudioHandler handler,
     required CatalogRepository catalog,
+    required OfflineDownloadService offline,
   })  : _handler = handler,
         _catalog = catalog,
+        _offline = offline,
         super(const PlayerViewState()) {
     _subs.add(
       _handler.playerStateStream.listen((playerState) {
@@ -102,7 +106,14 @@ class PlayerController extends StateNotifier<PlayerViewState> {
 
   final QaariAudioHandler _handler;
   final CatalogRepository _catalog;
+  final OfflineDownloadService _offline;
   final List<StreamSubscription<dynamic>> _subs = [];
+
+  Future<Recitation> _withOfflineSource(Recitation track) async {
+    final local = await _offline.localPathFor(track.id);
+    if (local == null || local.isEmpty) return track;
+    return track.copyWith(audioUrl: local);
+  }
 
   Future<void> playRecitation(
     Recitation track, {
@@ -112,6 +123,7 @@ class PlayerController extends StateNotifier<PlayerViewState> {
         ? <Recitation>[track]
         : List<Recitation>.from(queue);
     final index = resolvedQueue.indexWhere((item) => item.id == track.id);
+    final playable = await _withOfflineSource(track);
 
     try {
       if (state.current?.id == track.id && state.isPlaying && queue == null) {
@@ -126,7 +138,7 @@ class PlayerController extends StateNotifier<PlayerViewState> {
         duration: Duration(seconds: track.duration),
         clearError: true,
       );
-      await _handler.playRecitation(track);
+      await _handler.playRecitation(playable);
       state = state.copyWith(
         current: track,
         isPlaying: true,

@@ -8,6 +8,7 @@ import 'package:qaari_sl_mobile/core/share/share_recitation.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
+import 'package:qaari_sl_mobile/features/downloads/downloads_screen.dart';
 import 'package:qaari_sl_mobile/features/player/open_player.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/playlists/add_to_playlist_sheet.dart';
@@ -372,6 +373,7 @@ class _SurahRow extends ConsumerWidget {
                     ],
                   ),
                 ),
+                DownloadActionButton(recitation: track),
                 PopupMenuButton<String>(
                   icon: const Icon(
                     Icons.more_horiz_rounded,

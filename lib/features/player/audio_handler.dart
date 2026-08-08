@@ -51,15 +51,26 @@ class QaariAudioHandler extends BaseAudioHandler with SeekHandler {
     );
 
     if (!same) {
-      await _player.setUrl(track.audioUrl);
+      await _setSource(track.audioUrl);
     }
 
     await play();
   }
 
+  Future<void> _setSource(String url) async {
+    final isFile = url.startsWith('file:') ||
+        (url.isNotEmpty && !url.contains('://') && (url.startsWith('/') || url.contains(r'\')));
+    if (isFile) {
+      final path = url.startsWith('file:') ? Uri.parse(url).toFilePath() : url;
+      await _player.setFilePath(path);
+    } else {
+      await _player.setUrl(url);
+    }
+  }
+
   Future<void> replaceUrlAndResume(String url, {Duration? position}) async {
     final wasPlaying = _player.playing;
-    await _player.setUrl(url);
+    await _setSource(url);
     if (position != null) {
       await _player.seek(position);
     }

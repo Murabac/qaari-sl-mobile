@@ -6,6 +6,7 @@ import 'package:qaari_sl_mobile/core/data/catalog_repository.dart';
 import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/features/reciters/reciter_detail_screen.dart';
+import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -17,11 +18,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
+  final _allRecitersKey = GlobalKey();
   String _query = '';
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -32,10 +36,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return all.take(5).toList();
   }
 
+  void _scrollToAllReciters() {
+    final ctx = _allRecitersKey.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 350),
+        curve: Curves.easeOutCubic,
+        alignment: 0.05,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
     final asyncReciters = ref.watch(recitersProvider(_query));
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -75,6 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onRefresh: () async =>
                       ref.invalidate(recitersProvider(_query)),
                   child: CustomScrollView(
+                    controller: _scrollController,
                     slivers: [
                       if (_query.isEmpty && featured.isNotEmpty) ...[
                         SliverToBoxAdapter(
@@ -82,22 +100,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                             child: Row(
                               children: [
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    'Featured Reciters',
-                                    style: TextStyle(
+                                    l10n.featuredReciters,
+                                    style: const TextStyle(
                                       color: AppColors.ink,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  'See all',
-                                  style: TextStyle(
-                                    color: AppColors.gold,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
+                                InkWell(
+                                  onTap: _scrollToAllReciters,
+                                  child: Text(
+                                    l10n.seeAll,
+                                    style: const TextStyle(
+                                      color: AppColors.gold,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -127,10 +148,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                       ],
                       SliverToBoxAdapter(
+                        key: _allRecitersKey,
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
                           child: Text(
-                            _query.isEmpty ? 'All Reciters' : 'Results',
+                            _query.isEmpty ? l10n.allReciters : l10n.results,
                             style: const TextStyle(
                               color: AppColors.ink,
                               fontSize: 16,
@@ -252,9 +274,9 @@ class _HomeHeader extends StatelessWidget {
                     onChanged: onChanged,
                     style: const TextStyle(color: AppColors.cream, fontSize: 14),
                     cursorColor: AppColors.gold,
-                    decoration: const InputDecoration(
-                      hintText: 'Search reciters...',
-                      hintStyle: TextStyle(
+                    decoration: InputDecoration(
+                      hintText: AppLocalizations.of(context).searchReciters,
+                      hintStyle: const TextStyle(
                         color: AppColors.mutedSoft,
                         fontSize: 14,
                       ),

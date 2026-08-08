@@ -6,6 +6,7 @@ import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/locale/locale_controller.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/splash/splash_screen.dart';
+import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 
 class QaariSlApp extends ConsumerWidget {
   const QaariSlApp({super.key});
@@ -20,6 +21,7 @@ class QaariSlApp extends ConsumerWidget {
       theme: AppTheme.light,
       locale: locale,
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         _FallbackMaterialLocalizationsDelegate(),
         _FallbackCupertinoLocalizationsDelegate(),
         GlobalWidgetsLocalizations.delegate,

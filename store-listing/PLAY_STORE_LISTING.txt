@@ -1,0 +1,69 @@
+Google Play — Main store listing (default language: English)
+============================================================
+
+App name (max 30) — already set if this matches:
+Xulka Quraada
+(14 characters)
+
+----------------------------------------------------------
+SHORT DESCRIPTION (max 80) — copy exactly:
+----------------------------------------------------------
+Listen to sacred Quran recitations from beloved Somali qaris.
+
+(73 characters)
+
+Alternative (if you want “archive” wording):
+Sacred Somali Quran voices — listen, favorite, and revisit anytime.
+(68 characters)
+
+----------------------------------------------------------
+FULL DESCRIPTION (max 4000) — copy below:
+----------------------------------------------------------
+Xulka Quraada brings you a curated archive of Quranic recitation from the Somali community — homeland and diaspora.
+
+Discover reciters, browse surahs, and listen with a clean player built for focused listening. Save favorites and organize playlists so your most-loved recitations are always close at hand.
+
+WHAT YOU CAN DO
+• Browse approved reciters and their recitations
+• Play any surah with clear next / previous controls
+• Favorite recitations you want to return to
+• Build personal playlists
+• Create an account to sync favorites and playlists across devices
+
+WHO IT’S FOR
+Listeners who want authentic Somali Quranic voices in one place — whether you are learning, reflecting, or simply listening at home, on the road, or abroad.
+
+ABOUT THE ARCHIVE
+Recitations are reviewed before they appear in the catalog, so you hear quality, intentional recordings — not an unfiltered upload dump.
+
+Privacy & account help: https://qaari.mahaysaa.com/privacy
+Request account deletion: https://qaari.mahaysaa.com/account-deletion
+
+Xulka Quraada — sacred Quranic voices of the Somali community.
+
+----------------------------------------------------------
+GRAPHICS (upload from this folder)
+----------------------------------------------------------
+App icon (512×512):
+  play-icon-512.png
+
+Feature graphic (1024×500):
+  play-feature-graphic-1024x500.png
+  (JPEG also available: play-feature-graphic-1024x500.jpg)
+
+Phone screenshots:
+  Required: 2–8 images, 16:9 or 9:16, each side 320–3840 px
+  For promotion eligibility: at least 4 screenshots ≥1080 px on each side
+  → Capture from a phone or emulator (see SCREENSHOTS.md)
+
+Tablet screenshots: optional for launch
+
+Video: optional YouTube URL (public/unlisted, no ads, not age-restricted)
+
+----------------------------------------------------------
+NOTES
+----------------------------------------------------------
+• Do not claim medical, miraculous, or unverifiable benefits.
+• Avoid “#1”, “best”, competitor bashing, or misleading claims.
+• App name must match branding used in the APK/AAB.
+• Families Policy: only target children if you intentionally comply with Families requirements.

@@ -5,6 +5,7 @@ import 'package:qaari_sl_mobile/features/home/home_screen.dart';
 import 'package:qaari_sl_mobile/features/player/mini_player_bar.dart';
 import 'package:qaari_sl_mobile/features/playlists/playlists_screen.dart';
 import 'package:qaari_sl_mobile/features/settings/settings_screen.dart';
+import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -25,6 +26,14 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final items = [
+      (Icons.home_rounded, l10n.navHome),
+      (Icons.favorite_rounded, l10n.navFavorites),
+      (Icons.queue_music_rounded, l10n.navPlaylists),
+      (Icons.settings_rounded, l10n.navSettings),
+    ];
+
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: IndexedStack(
@@ -37,6 +46,7 @@ class _HomeShellState extends State<HomeShell> {
           const MiniPlayerBar(),
           _QaariBottomNav(
             index: _index,
+            items: items,
             onChanged: (value) => setState(() => _index = value),
           ),
         ],
@@ -48,18 +58,13 @@ class _HomeShellState extends State<HomeShell> {
 class _QaariBottomNav extends StatelessWidget {
   const _QaariBottomNav({
     required this.index,
+    required this.items,
     required this.onChanged,
   });
 
   final int index;
+  final List<(IconData, String)> items;
   final ValueChanged<int> onChanged;
-
-  static const _items = [
-    (Icons.home_rounded, 'Home'),
-    (Icons.favorite_rounded, 'Favorites'),
-    (Icons.queue_music_rounded, 'Playlists'),
-    (Icons.settings_rounded, 'Settings'),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +76,7 @@ class _QaariBottomNav extends StatelessWidget {
       padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
       child: Row(
         children: [
-          for (var i = 0; i < _items.length; i++)
+          for (var i = 0; i < items.length; i++)
             Expanded(
               child: InkWell(
                 onTap: () => onChanged(i),
@@ -81,32 +86,19 @@ class _QaariBottomNav extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _items[i].$1,
-                        size: 21,
-                        color: i == index
-                            ? AppColors.forest
-                            : AppColors.mutedSoft,
+                        items[i].$1,
+                        color: i == index ? AppColors.forest : AppColors.muted,
+                        size: 22,
                       ),
-                      const SizedBox(height: 3),
+                      const SizedBox(height: 4),
                       Text(
-                        _items[i].$2,
+                        items[i].$2,
                         style: TextStyle(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight:
-                              i == index ? FontWeight.w800 : FontWeight.w500,
-                          color: i == index
-                              ? AppColors.forest
-                              : AppColors.mutedSoft,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 180),
-                        width: i == index ? 18 : 0,
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: AppColors.gold,
-                          borderRadius: BorderRadius.circular(2),
+                              i == index ? FontWeight.w800 : FontWeight.w600,
+                          color:
+                              i == index ? AppColors.forest : AppColors.muted,
                         ),
                       ),
                     ],
