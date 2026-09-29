@@ -64,8 +64,8 @@ class ReciterDetailScreen extends ConsumerWidget {
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              Color(0x730A1C11),
-                              Color(0xC70A1C11),
+                              Color(0x73062423),
+                              Color(0xC7062423),
                             ],
                           ),
                         ),

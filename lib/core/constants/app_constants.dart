@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 /// App-wide constants for Xulka Quraada mobile.
 class AppConstants {
   static const String appName = 'Xulka Quraada';
-  static const String logoAsset = 'assets/images/logo.svg';
+  static const String logoAsset = 'assets/images/logo.png';
 
   /// Override for local/dev: `--dart-define=API_BASE_URL=http://10.0.2.2:8000`
   /// Production APKs use the live API by default.

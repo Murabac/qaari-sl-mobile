@@ -1,50 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 
-/// Circular Qaari mark matching Mobile APP Design Ref `QaariLogo`.
+/// Safwat al-Qurra brand mark (transparent white calligraphy, or green badge).
 class QaariLogo extends StatelessWidget {
-  const QaariLogo({super.key, this.size = 80});
+  const QaariLogo({
+    super.key,
+    this.size = 80,
+    this.circle = true,
+    this.light = false,
+  });
 
   final double size;
+  final bool circle;
 
-  static const _svg = '''
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <defs>
-    <radialGradient id="qlBg" cx="42%" cy="36%" r="72%">
-      <stop offset="0%" stop-color="#244D3B"/>
-      <stop offset="100%" stop-color="#0A1C11"/>
-    </radialGradient>
-    <radialGradient id="qlGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#C9A24B" stop-opacity="0.18"/>
-      <stop offset="100%" stop-color="#C9A24B" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <circle cx="100" cy="100" r="99" fill="url(#qlBg)"/>
-  <circle cx="100" cy="100" r="80" fill="url(#qlGlow)"/>
-  <circle cx="100" cy="100" r="97" fill="none" stroke="#C9A24B" stroke-width="1.8"/>
-  <circle cx="100" cy="100" r="86" fill="none" stroke="#C9A24B" stroke-width="0.6" opacity="0.35"/>
-  <polygon points="100,35 115,63 146,54 137,85 165,100 137,115 146,146 115,137 100,165 85,137 54,146 63,115 35,100 63,85 54,54 85,63" fill="#C9A24B" opacity="0.10"/>
-  <polygon points="100,35 115,63 146,54 137,85 165,100 137,115 146,146 115,137 100,165 85,137 54,146 63,115 35,100 63,85 54,54 85,63" fill="none" stroke="#C9A24B" stroke-width="1.1" opacity="0.50"/>
-  <circle cx="100" cy="100" r="42" fill="none" stroke="#C9A24B" stroke-width="0.8" opacity="0.45"/>
-  <text x="100" y="119" font-family="Amiri, serif" font-size="64" fill="#C9A24B" text-anchor="middle" font-weight="400">ق</text>
-  <circle cx="100" cy="26" r="3" fill="#C9A24B"/>
-  <circle cx="174" cy="100" r="3" fill="#C9A24B"/>
-  <circle cx="100" cy="174" r="3" fill="#C9A24B"/>
-  <circle cx="26" cy="100" r="3" fill="#C9A24B"/>
-  <circle cx="148" cy="52" r="2" fill="#C9A24B" opacity="0.65"/>
-  <circle cx="148" cy="148" r="2" fill="#C9A24B" opacity="0.65"/>
-  <circle cx="52" cy="148" r="2" fill="#C9A24B" opacity="0.65"/>
-  <circle cx="52" cy="52" r="2" fill="#C9A24B" opacity="0.65"/>
-</svg>
-''';
+  /// White mark for dark backgrounds (splash / hero).
+  final bool light;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final asset = light
+        ? 'assets/images/logo-mark-light.png'
+        : (circle
+            ? 'assets/images/logo-circle.png'
+            : AppConstants.logoAsset);
+
+    final image = Image.asset(
+      asset,
       width: size,
       height: size,
-      child: SvgPicture.string(_svg, width: size, height: size),
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.high,
+      gaplessPlayback: true,
+    );
+
+    if (light || !circle) {
+      return SizedBox(width: size, height: size, child: image);
+    }
+
+    return ClipOval(
+      child: SizedBox(width: size, height: size, child: image),
     );
   }
 }
@@ -77,11 +72,11 @@ class ReciterInitialsAvatar extends StatelessWidget {
   Color get _bg {
     if (color != null) return color!;
     final palette = [
-      const Color(0xFF1B5E3B),
-      const Color(0xFF2E4A3A),
-      const Color(0xFF3D6B55),
-      const Color(0xFF24614A),
-      const Color(0xFF4A7862),
+      const Color(0xFF0C403E),
+      const Color(0xFF1C5A58),
+      const Color(0xFF14504E),
+      const Color(0xFF0A3836),
+      const Color(0xFF246866),
     ];
     return palette[name.hashCode.abs() % palette.length];
   }

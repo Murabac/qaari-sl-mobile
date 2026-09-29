@@ -239,7 +239,7 @@ class _HomeHeader extends StatelessWidget {
               const Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: QaariLogo(size: 44),
+                  child: QaariLogo(size: 64),
                 ),
               ),
               Container(
@@ -351,7 +351,7 @@ class _FeaturedCard extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Color(0xE008160E),
+                    Color(0xE0062423),
                   ],
                   stops: [0.25, 1],
                 ),

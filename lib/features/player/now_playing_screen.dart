@@ -101,7 +101,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
             )
           else
             const ColoredBox(color: AppColors.deep),
-          Container(color: const Color(0xD108140D)),
+          Container(color: const Color(0xD1062423)),
           SafeArea(
             child: Column(
               children: [

@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const QaariLogo(size: 130),
+            const QaariLogo(size: 130, light: true),
             const SizedBox(height: 28),
             Text(
               AppConstants.appName,
