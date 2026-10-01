@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navHome => 'Home';
 
   @override
+  String get navMoments => 'Moments';
+
+  @override
   String get navFavorites => 'Favorites';
 
   @override
@@ -19,6 +22,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get navSettings => 'Settings';
+
+  @override
+  String get momentsEmpty => 'No Moments yet. Check back soon.';
 
   @override
   String get featuredReciters => 'Featured Reciters';

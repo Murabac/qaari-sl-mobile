@@ -1,9 +1,11 @@
 {
   "@@locale": "ar",
   "navHome": "الرئيسية",
+  "navMoments": "لحظات",
   "navFavorites": "المفضلة",
   "navPlaylists": "القوائم",
   "navSettings": "الإعدادات",
+  "momentsEmpty": "لا لحظات بعد. عد قريبًا.",
   "featuredReciters": "قراء مميزون",
   "seeAll": "عرض الكل",
   "allReciters": "كل القراء",

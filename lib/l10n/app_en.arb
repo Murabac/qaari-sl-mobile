@@ -1,9 +1,11 @@
 {
   "@@locale": "en",
   "navHome": "Home",
+  "navMoments": "Moments",
   "navFavorites": "Favorites",
   "navPlaylists": "Playlists",
   "navSettings": "Settings",
+  "momentsEmpty": "No Moments yet. Check back soon.",
   "featuredReciters": "Featured Reciters",
   "seeAll": "See all",
   "allReciters": "All Reciters",

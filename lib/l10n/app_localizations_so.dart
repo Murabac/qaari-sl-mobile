@@ -12,6 +12,9 @@ class AppLocalizationsSo extends AppLocalizations {
   String get navHome => 'Guriga';
 
   @override
+  String get navMoments => 'Dhaqdho';
+
+  @override
   String get navFavorites => 'La jecel yahay';
 
   @override
@@ -19,6 +22,9 @@ class AppLocalizationsSo extends AppLocalizations {
 
   @override
   String get navSettings => 'Dejinta';
+
+  @override
+  String get momentsEmpty => 'Weli ma jiro Dhaqdho. Markale soo noqo.';
 
   @override
   String get featuredReciters => 'Qaariyada la soo bandhigay';

@@ -106,6 +106,12 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get navHome;
 
+  /// No description provided for @navMoments.
+  ///
+  /// In en, this message translates to:
+  /// **'Moments'**
+  String get navMoments;
+
   /// No description provided for @navFavorites.
   ///
   /// In en, this message translates to:
@@ -123,6 +129,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get navSettings;
+
+  /// No description provided for @momentsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No Moments yet. Check back soon.'**
+  String get momentsEmpty;
 
   /// No description provided for @featuredReciters.
   ///

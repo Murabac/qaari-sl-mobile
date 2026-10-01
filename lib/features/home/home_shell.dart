@@ -1,41 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/features/favorites/favorites_screen.dart';
 import 'package:qaari_sl_mobile/features/home/home_screen.dart';
+import 'package:qaari_sl_mobile/features/moments/moments_screen.dart';
 import 'package:qaari_sl_mobile/features/player/mini_player_bar.dart';
+import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/playlists/playlists_screen.dart';
 import 'package:qaari_sl_mobile/features/settings/settings_screen.dart';
 import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 
-class HomeShell extends StatefulWidget {
+class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
 
   @override
-  State<HomeShell> createState() => _HomeShellState();
+  ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
   static const _pages = [
     HomeScreen(),
+    MomentsScreen(),
     FavoritesScreen(),
     PlaylistsScreen(),
     SettingsScreen(),
   ];
+
+  bool get _onMoments => _index == 1;
+
+  void _onTabChanged(int value) {
+    if (value == 1) {
+      ref.read(playerControllerProvider.notifier).pause();
+    }
+    setState(() => _index = value);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final items = [
       (Icons.home_rounded, l10n.navHome),
+      (Icons.auto_awesome_rounded, l10n.navMoments),
       (Icons.favorite_rounded, l10n.navFavorites),
       (Icons.queue_music_rounded, l10n.navPlaylists),
       (Icons.settings_rounded, l10n.navSettings),
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.cream,
+      backgroundColor: _onMoments ? AppColors.deep : AppColors.cream,
       body: IndexedStack(
         index: _index,
         children: _pages,
@@ -43,11 +57,11 @@ class _HomeShellState extends State<HomeShell> {
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const MiniPlayerBar(),
+          if (!_onMoments) const MiniPlayerBar(),
           _QaariBottomNav(
             index: _index,
             items: items,
-            onChanged: (value) => setState(() => _index = value),
+            onChanged: _onTabChanged,
           ),
         ],
       ),
@@ -93,8 +107,10 @@ class _QaariBottomNav extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         items[i].$2,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10,
                           fontWeight:
                               i == index ? FontWeight.w800 : FontWeight.w600,
                           color:

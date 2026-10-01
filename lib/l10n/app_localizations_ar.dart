@@ -12,6 +12,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navHome => 'الرئيسية';
 
   @override
+  String get navMoments => 'لحظات';
+
+  @override
   String get navFavorites => 'المفضلة';
 
   @override
@@ -19,6 +22,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get navSettings => 'الإعدادات';
+
+  @override
+  String get momentsEmpty => 'لا لحظات بعد. عد قريبًا.';
 
   @override
   String get featuredReciters => 'قراء مميزون';

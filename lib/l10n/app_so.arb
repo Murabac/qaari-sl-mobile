@@ -1,9 +1,11 @@
 {
   "@@locale": "so",
   "navHome": "Guriga",
+  "navMoments": "Dhaqdho",
   "navFavorites": "La jecel yahay",
   "navPlaylists": "Liisaska",
   "navSettings": "Dejinta",
+  "momentsEmpty": "Weli ma jiro Dhaqdho. Markale soo noqo.",
   "featuredReciters": "Qaariyada la soo bandhigay",
   "seeAll": "Dhamaan arag",
   "allReciters": "Dhammaan qaariyada",
