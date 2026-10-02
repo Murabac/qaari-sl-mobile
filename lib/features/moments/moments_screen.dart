@@ -66,7 +66,6 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(momentsFeedProvider);
     final languageCode = Localizations.localeOf(context).languageCode;
-    final topInset = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
       backgroundColor: AppColors.deep,
@@ -104,16 +103,8 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
             );
           }
 
-          return Column(
+          return Stack(
             children: [
-              // Keep status bar / camera cutout clear of video.
-              SizedBox(
-                height: topInset,
-                child: const ColoredBox(color: AppColors.deep),
-              ),
-              Expanded(
-                child: Stack(
-                  children: [
                     PageView.builder(
                       controller: _pageController,
                       scrollDirection: Axis.vertical,
@@ -172,9 +163,6 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
-            ],
           );
         },
       ),

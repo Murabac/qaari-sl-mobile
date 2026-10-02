@@ -19,6 +19,20 @@ class QaariSlApp extends ConsumerWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      builder: (context, child) {
+        final top = MediaQuery.paddingOf(context).top;
+        return ColoredBox(
+          color: Colors.white,
+          child: Padding(
+            padding: EdgeInsets.only(top: top),
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: child ?? const SizedBox.shrink(),
+            ),
+          ),
+        );
+      },
       locale: locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
