@@ -73,8 +73,8 @@ class ReciterDetailScreen extends ConsumerWidget {
                       Positioned(
                         top: MediaQuery.paddingOf(context).top + 8,
                         left: 16,
-                        child: _CircleIconButton(
-                          icon: Icons.chevron_left_rounded,
+                        child: QaariForestIconButton(
+                          icon: Icons.arrow_back_rounded,
                           onTap: () => Navigator.of(context).pop(),
                         ),
                       ),
@@ -253,30 +253,6 @@ class _StatCell extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
-  const _CircleIconButton({required this.icon, required this.onTap});
-
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.cream.withValues(alpha: 0.18),
-      shape: const CircleBorder(),
-      child: InkWell(
-        customBorder: const CircleBorder(),
-        onTap: onTap,
-        child: SizedBox(
-          width: 38,
-          height: 38,
-          child: Icon(icon, color: AppColors.cream, size: 22),
-        ),
       ),
     );
   }

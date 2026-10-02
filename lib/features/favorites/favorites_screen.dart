@@ -20,6 +20,7 @@ class FavoritesScreen extends ConsumerWidget {
     return Column(
       children: [
         ForestPageHeader(
+          eyebrow: 'Personal Sanctuary',
           title: 'Favorites',
           subtitle: auth.isAuthenticated
               ? '${favorites.tracks.length} saved '

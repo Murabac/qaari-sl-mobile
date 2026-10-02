@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/home/home_shell.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
@@ -51,23 +52,20 @@ class _SplashScreenState extends State<SplashScreen>
             Text(
               AppConstants.appName,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.gold,
+              style: AppTheme.displayFont(
                 fontSize: 34,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.6,
-                height: 1.1,
+                color: AppColors.goldLight,
+                weight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 12),
             Text(
-              'SOMALI COMMUNITY QURAN RECITERS',
-              style: TextStyle(
-                color: AppColors.cream.withValues(alpha: 0.4),
-                fontSize: 11,
-                letterSpacing: 2.4,
-                fontWeight: FontWeight.w600,
-              ),
+              'SAFWAT AL-QURRA · XULKA QURAADA',
+              style: AppTheme.sans(
+                color: AppColors.cream.withValues(alpha: 0.45),
+                fontSize: 10,
+                weight: FontWeight.w700,
+              ).copyWith(letterSpacing: 2),
             ),
             const SizedBox(height: 28),
             AnimatedBuilder(

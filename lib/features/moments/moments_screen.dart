@@ -5,6 +5,7 @@ import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
 import 'package:qaari_sl_mobile/core/data/moments_repository.dart';
 import 'package:qaari_sl_mobile/core/models/moment.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
 import 'package:qaari_sl_mobile/features/follow_along/follow_along_screen.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
@@ -14,7 +15,10 @@ import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 import 'package:video_player/video_player.dart';
 
 class MomentsScreen extends ConsumerStatefulWidget {
-  const MomentsScreen({super.key});
+  const MomentsScreen({super.key, this.isActive = true});
+
+  /// False when another bottom-nav tab is selected (IndexedStack keeps us alive).
+  final bool isActive;
 
   @override
   ConsumerState<MomentsScreen> createState() => _MomentsScreenState();
@@ -62,89 +66,112 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
     final l10n = AppLocalizations.of(context);
     final async = ref.watch(momentsFeedProvider);
     final languageCode = Localizations.localeOf(context).languageCode;
+    final topInset = MediaQuery.paddingOf(context).top;
 
     return Scaffold(
       backgroundColor: AppColors.deep,
       body: async.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
+        loading: () => SafeArea(
+          child: const Center(
+            child: CircularProgressIndicator(color: AppColors.gold),
+          ),
         ),
-        error: (error, _) => AsyncBody(
-          isLoading: false,
-          error: error,
-          isEmpty: false,
-          onRetry: () => ref.invalidate(momentsFeedProvider),
-          child: const SizedBox.shrink(),
+        error: (error, _) => SafeArea(
+          child: AsyncBody(
+            isLoading: false,
+            error: error,
+            isEmpty: false,
+            onRetry: () => ref.invalidate(momentsFeedProvider),
+            child: const SizedBox.shrink(),
+          ),
         ),
         data: (moments) {
           if (moments.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  l10n.momentsEmpty,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.cream,
-                    fontWeight: FontWeight.w700,
+            return SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Text(
+                    l10n.momentsEmpty,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.cream,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
             );
           }
 
-          return Stack(
+          return Column(
             children: [
-              PageView.builder(
-                controller: _pageController,
-                scrollDirection: Axis.vertical,
-                itemCount: moments.length,
-                onPageChanged: (index) {
-                  setState(() => _page = index);
-                  ref.read(playerControllerProvider.notifier).pause();
-                },
-                itemBuilder: (context, index) {
-                  final moment = moments[index];
-                  return _MomentPage(
-                    moment: moment,
-                    active: index == _page,
-                    muted: _muted,
-                    languageCode: languageCode,
-                    onToggleMute: () => setState(() => _muted = !_muted),
-                    onToggleLike: () => _toggleLike(moment),
-                    onOpenReciter: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) =>
-                              ReciterDetailScreen(reciterId: moment.reciterId),
-                        ),
-                      );
-                    },
-                    onOpenFollowAlong: moment.linkedRecitationId == null
-                        ? null
-                        : () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => FollowAlongScreen(
-                                  recitationId: moment.linkedRecitationId!,
-                                ),
-                              ),
-                            );
-                          },
-                  );
-                },
+              // Keep status bar / camera cutout clear of video.
+              SizedBox(
+                height: topInset,
+                child: const ColoredBox(color: AppColors.deep),
               ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  child: Text(
-                    l10n.navMoments,
-                    style: const TextStyle(
-                      color: AppColors.cream,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 18,
+              Expanded(
+                child: Stack(
+                  children: [
+                    PageView.builder(
+                      controller: _pageController,
+                      scrollDirection: Axis.vertical,
+                      itemCount: moments.length,
+                      onPageChanged: (index) {
+                        setState(() => _page = index);
+                        ref.read(playerControllerProvider.notifier).pause();
+                      },
+                      itemBuilder: (context, index) {
+                        final moment = moments[index];
+                        return _MomentPage(
+                          moment: moment,
+                          active: widget.isActive && index == _page,
+                          muted: _muted,
+                          languageCode: languageCode,
+                          onToggleMute: () =>
+                              setState(() => _muted = !_muted),
+                          onToggleLike: () => _toggleLike(moment),
+                          onOpenReciter: moment.reciterId == null
+                              ? null
+                              : () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => ReciterDetailScreen(
+                                        reciterId: moment.reciterId!,
+                                      ),
+                                    ),
+                                  );
+                                },
+                          onOpenFollowAlong: moment.linkedRecitationId == null
+                              ? null
+                              : () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => FollowAlongScreen(
+                                        recitationId:
+                                            moment.linkedRecitationId!,
+                                      ),
+                                    ),
+                                  );
+                                },
+                        );
+                      },
                     ),
-                  ),
+                    Positioned(
+                      left: 16,
+                      top: 8,
+                      right: 16,
+                      child: Text(
+                        l10n.navMoments,
+                        style: AppTheme.displayFont(
+                          fontSize: 22,
+                          color: AppColors.cream,
+                          weight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -173,7 +200,7 @@ class _MomentPage extends StatefulWidget {
   final String languageCode;
   final VoidCallback onToggleMute;
   final VoidCallback onToggleLike;
-  final VoidCallback onOpenReciter;
+  final VoidCallback? onOpenReciter;
   final VoidCallback? onOpenFollowAlong;
 
   @override
@@ -254,6 +281,9 @@ class _MomentPageState extends State<_MomentPage> {
     final moment = widget.moment;
     final reciterName =
         moment.reciter?.localizedName(widget.languageCode) ?? '';
+    final headline = reciterName.isNotEmpty
+        ? reciterName
+        : (moment.title ?? '').trim();
     final surahLabel = moment.surah == null
         ? null
         : moment.ayahNumber == null
@@ -262,6 +292,7 @@ class _MomentPageState extends State<_MomentPage> {
 
     return GestureDetector(
       onTap: () {
+        if (!widget.active) return;
         final c = _controller;
         if (c == null || !_ready) return;
         if (c.value.isPlaying) {
@@ -274,7 +305,7 @@ class _MomentPageState extends State<_MomentPage> {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          ColoredBox(color: AppColors.deep),
+          const ColoredBox(color: AppColors.deep),
           if (_ready && _controller != null)
             FittedBox(
               fit: BoxFit.cover,
@@ -318,18 +349,20 @@ class _MomentPageState extends State<_MomentPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                InkWell(
-                  onTap: widget.onOpenReciter,
-                  child: Text(
-                    reciterName,
-                    style: const TextStyle(
-                      color: AppColors.cream,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 17,
+                if (headline.isNotEmpty)
+                  InkWell(
+                    onTap: widget.onOpenReciter,
+                    child: Text(
+                      headline,
+                      style: const TextStyle(
+                        color: AppColors.cream,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 17,
+                      ),
                     ),
                   ),
-                ),
-                if ((moment.title ?? '').isNotEmpty) ...[
+                if ((moment.title ?? '').isNotEmpty &&
+                    headline != moment.title) ...[
                   const SizedBox(height: 6),
                   Text(
                     moment.title!,
@@ -365,7 +398,9 @@ class _MomentPageState extends State<_MomentPage> {
                       decoration: BoxDecoration(
                         color: AppColors.forest.withValues(alpha: 0.85),
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
+                        border: Border.all(
+                          color: AppColors.gold.withValues(alpha: 0.5),
+                        ),
                       ),
                       child: Text(
                         surahLabel,
@@ -394,7 +429,9 @@ class _MomentPageState extends State<_MomentPage> {
                 ),
                 const SizedBox(height: 18),
                 _SideAction(
-                  icon: widget.muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
+                  icon: widget.muted
+                      ? Icons.volume_off_rounded
+                      : Icons.volume_up_rounded,
                   color: AppColors.cream,
                   label: widget.muted ? 'Muted' : 'Sound',
                   onTap: widget.onToggleMute,

@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/shared/widgets/design_primitives.dart';
 import 'package:qaari_sl_mobile/shared/widgets/qaari_logo.dart';
 
+export 'design_primitives.dart';
 export 'qaari_logo.dart';
 
 class AsyncBody extends StatelessWidget {
@@ -138,60 +140,28 @@ class NetworkAvatar extends StatelessWidget {
   }
 }
 
-/// Forest section header used on Favorites / Playlists / Settings.
+/// Premium cream header (legacy name kept for call sites).
 class ForestPageHeader extends StatelessWidget {
   const ForestPageHeader({
     super.key,
     required this.title,
     this.subtitle,
     this.trailing,
+    this.eyebrow,
   });
 
   final String title;
   final String? subtitle;
   final Widget? trailing;
+  final String? eyebrow;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: AppColors.forest,
-      padding: EdgeInsets.fromLTRB(
-        20,
-        MediaQuery.paddingOf(context).top + 16,
-        20,
-        20,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.cream,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                if (subtitle != null) ...[
-                  const SizedBox(height: 3),
-                  Text(
-                    subtitle!,
-                    style: const TextStyle(
-                      color: AppColors.gold,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-          ?trailing,
-        ],
-      ),
+    return CreamPageHeader(
+      eyebrow: eyebrow,
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing,
     );
   }
 }

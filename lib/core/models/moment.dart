@@ -20,7 +20,7 @@ class Moment {
   });
 
   final int id;
-  final int reciterId;
+  final int? reciterId;
   final int? surahId;
   final int? ayahNumber;
   final String? title;
@@ -39,7 +39,7 @@ class Moment {
     final surahJson = json['surah'];
     return Moment(
       id: (json['id'] as num).toInt(),
-      reciterId: (json['reciter_id'] as num).toInt(),
+      reciterId: (json['reciter_id'] as num?)?.toInt(),
       surahId: (json['surah_id'] as num?)?.toInt(),
       ayahNumber: (json['ayah_number'] as num?)?.toInt(),
       title: json['title'] as String?,

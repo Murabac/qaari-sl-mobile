@@ -17,136 +17,138 @@ class MiniPlayerBar extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    final title = track.surah?.nameEnglish.isNotEmpty == true
-        ? track.surah!.nameEnglish
-        : 'Surah ${track.surahId}';
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final title = track.surah?.localizedName(languageCode) ??
+        'Surah ${track.surahId}';
     final artist = track.reciterName ?? AppConstants.appName;
+    final surahNumber = track.surah?.number ?? track.surahId;
     final progress = player.duration.inMilliseconds == 0
         ? 0.0
         : (player.position.inMilliseconds / player.duration.inMilliseconds)
             .clamp(0.0, 1.0);
 
-    return Material(
-      color: AppColors.forest,
-      elevation: 0,
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.forest,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.22),
-              blurRadius: 20,
-              offset: const Offset(0, -3),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _openPlayer(context),
+          borderRadius: BorderRadius.circular(16),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: AppColors.forest.withValues(alpha: 0.95),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
+              boxShadow: AppColors.miniPlayerShadow,
             ),
-          ],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-        child: Row(
-          children: [
-            GestureDetector(
-              onTap: () => _openPlayer(context),
-              child: Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: AppColors.forestSoft,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'ق',
-                  style: AppTheme.amiri(
-                    fontSize: 18,
-                    color: AppColors.gold,
-                    height: 1,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 2,
+                    backgroundColor: AppColors.forestSoft,
+                    color: AppColors.goldLight,
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => _openPlayer(context),
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.cream,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: AppColors.deep,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.gold.withValues(alpha: 0.45),
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$surahNumber',
+                          style: AppTheme.displayFont(
+                            fontSize: 16,
+                            color: AppColors.goldLight,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 1),
-                    Text(
-                      artist,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.gold,
-                        fontSize: 11,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.displayFont(
+                                fontSize: 15,
+                                color: AppColors.cream,
+                                weight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              artist,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.sans(
+                                fontSize: 11,
+                                color: AppColors.mutedOnDark,
+                                weight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => ref
+                            .read(playerControllerProvider.notifier)
+                            .toggle(),
+                        icon: Icon(
+                          player.isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
+                          color: AppColors.deep,
+                        ),
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppColors.gold,
+                          minimumSize: const Size(36, 36),
+                        ),
+                      ),
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => ref
+                            .read(playerControllerProvider.notifier)
+                            .playNext(),
+                        icon: const Icon(
+                          Icons.skip_next_rounded,
+                          color: AppColors.mutedOnDark,
+                          size: 22,
+                        ),
+                      ),
+                      IconButton(
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => _openPlayer(context),
+                        icon: const Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: AppColors.mutedOnDark,
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 56,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(2),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  minHeight: 2.5,
-                  backgroundColor: AppColors.cream.withValues(alpha: 0.15),
-                  color: AppColors.gold,
-                ),
-              ),
-            ),
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              onPressed: () =>
-                  ref.read(playerControllerProvider.notifier).toggle(),
-              icon: Icon(
-                player.isPlaying
-                    ? Icons.pause_rounded
-                    : Icons.play_arrow_rounded,
-                color: AppColors.gold,
-                size: 22,
-              ),
-            ),
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              onPressed: () {
-                final next = player.position + const Duration(seconds: 10);
-                final max = player.duration;
-                ref.read(playerControllerProvider.notifier).seek(
-                      next > max ? max : next,
-                    );
-              },
-              icon: Icon(
-                Icons.skip_next_rounded,
-                color: AppColors.cream.withValues(alpha: 0.7),
-                size: 20,
-              ),
-            ),
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              onPressed: () =>
-                  ref.read(playerControllerProvider.notifier).stop(),
-              icon: Icon(
-                Icons.close_rounded,
-                color: AppColors.cream.withValues(alpha: 0.5),
-                size: 16,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

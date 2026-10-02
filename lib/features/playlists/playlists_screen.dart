@@ -20,6 +20,7 @@ class PlaylistsScreen extends ConsumerWidget {
     return Column(
       children: [
         ForestPageHeader(
+          eyebrow: 'Your Collections',
           title: 'Playlists',
           subtitle: auth.isAuthenticated
               ? asyncPlaylists.maybeWhen(

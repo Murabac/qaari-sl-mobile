@@ -40,7 +40,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Column(
       children: [
-        ForestPageHeader(title: l10n.settings),
+        ForestPageHeader(
+          eyebrow: 'Preferences',
+          title: l10n.settings,
+          subtitle: 'Audio, language, and account settings',
+        ),
         Expanded(
           child: ColoredBox(
             color: AppColors.cream,
