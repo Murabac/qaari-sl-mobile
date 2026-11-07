@@ -9,19 +9,19 @@ class AppLocalizationsSo extends AppLocalizations {
   AppLocalizationsSo([String locale = 'so']) : super(locale);
 
   @override
-  String get navHome => 'Guriga';
+  String get navHome => 'Home';
 
   @override
-  String get navMoments => 'Dhaqdho';
+  String get navMoments => 'Moments';
 
   @override
-  String get navFavorites => 'La jecel yahay';
+  String get navFavorites => 'Favorites';
 
   @override
-  String get navPlaylists => 'Liisaska';
+  String get navPlaylists => 'Playlists';
 
   @override
-  String get navSettings => 'Dejinta';
+  String get navSettings => 'Settings';
 
   @override
   String get momentsEmpty => 'Weli ma jiro Dhaqdho. Markale soo noqo.';

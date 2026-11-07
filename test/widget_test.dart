@@ -150,7 +150,7 @@ void main() {
 
     expect(find.text('Kusoo Dhawoow Xulka Quraada'), findsOneWidget);
     expect(find.text('Demo'), findsWidgets);
-    expect(find.text('Guriga'), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
   });
 }
 

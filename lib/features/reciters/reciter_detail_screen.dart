@@ -14,6 +14,7 @@ import 'package:qaari_sl_mobile/features/player/open_player.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/playlists/add_to_playlist_sheet.dart';
 import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
+import 'package:qaari_sl_mobile/shared/widgets/reciter_portrait.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class ReciterDetailScreen extends ConsumerWidget {
@@ -76,8 +77,8 @@ class ReciterDetailScreen extends ConsumerWidget {
                         bottom: 18,
                         child: Row(
                           children: [
-                            NetworkAvatar(
-                              url: reciter.photoUrl,
+                            ReciterFace(
+                              reciter: reciter,
                               size: 58,
                               nameForFallback: name,
                             ),

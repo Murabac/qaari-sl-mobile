@@ -9,6 +9,7 @@ import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/reciters/reciter_detail_screen.dart';
 import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
+import 'package:qaari_sl_mobile/shared/widgets/reciter_portrait.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -431,7 +432,12 @@ class _FeaturedCard extends StatelessWidget {
                   fit: StackFit.expand,
                   children: [
                     const ColoredBox(color: AppColors.forest),
-                    if ((reciter.photoUrl ?? '').isNotEmpty)
+                    if (reciterPortraitAsset(reciter) != null)
+                      Image.asset(
+                        reciterPortraitAsset(reciter)!,
+                        fit: BoxFit.cover,
+                      )
+                    else if ((reciter.photoUrl ?? '').isNotEmpty)
                       CachedNetworkImage(
                         imageUrl: reciter.photoUrl!,
                         fit: BoxFit.contain,
@@ -583,10 +589,9 @@ class _ReciterRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              NetworkAvatar(
-                url: reciter.photoUrl,
-                size: 48,
-                borderRadius: BorderRadius.circular(12),
+              ReciterFace(
+                reciter: reciter,
+                size: 56,
                 nameForFallback: name,
               ),
               const SizedBox(width: 12),

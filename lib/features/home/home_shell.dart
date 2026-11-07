@@ -124,19 +124,23 @@ class _QaariBottomNav extends StatelessWidget {
                         children: [
                           AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            width: 36,
+                            width: i == 1 ? 42 : 36,
                             height: 28,
                             decoration: BoxDecoration(
-                              color: i == index
-                                  ? (dark ? AppColors.gold : AppColors.forest)
+                              color: i == index && i == 1
+                                  ? const Color(0xFFE5B54F)
                                   : Colors.transparent,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(
                               items[i].$1,
                               size: 18,
                               color: i == index
-                                  ? (dark ? AppColors.deep : AppColors.goldLight)
+                                  ? (i == 1
+                                      ? AppColors.deep
+                                      : (dark
+                                          ? AppColors.goldLight
+                                          : AppColors.ink))
                                   : (dark
                                       ? AppColors.mutedOnDark
                                       : AppColors.muted),
@@ -158,7 +162,7 @@ class _QaariBottomNav extends StatelessWidget {
                                       : AppColors.muted),
                             ),
                           ),
-                          if (i == index)
+                          if (i == index && i != 1)
                             Container(
                               margin: const EdgeInsets.only(top: 2),
                               width: 4,

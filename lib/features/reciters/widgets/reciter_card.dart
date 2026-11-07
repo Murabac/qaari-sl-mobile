@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
-import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
+import 'package:qaari_sl_mobile/shared/widgets/reciter_portrait.dart';
 
 class ReciterCard extends StatelessWidget {
   const ReciterCard({
@@ -35,7 +35,11 @@ class ReciterCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              NetworkAvatar(url: reciter.photoUrl, size: 64),
+              ReciterFace(
+                reciter: reciter,
+                size: 64,
+                nameForFallback: name,
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(

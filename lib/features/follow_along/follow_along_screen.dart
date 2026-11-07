@@ -184,9 +184,12 @@ class _FollowAlongScreenState extends ConsumerState<FollowAlongScreen> {
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
-                              border: active
-                                  ? null
-                                  : Border.all(color: AppColors.border),
+                              border: Border.all(
+                                color: active
+                                    ? AppColors.gold
+                                    : AppColors.border,
+                                width: active ? 1.6 : 1,
+                              ),
                               boxShadow: active
                                   ? [
                                       BoxShadow(
