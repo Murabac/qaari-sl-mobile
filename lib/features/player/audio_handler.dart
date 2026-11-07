@@ -7,7 +7,7 @@ Future<QaariAudioHandler> initAudioService() {
   return AudioService.init(
     builder: QaariAudioHandler.new,
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'com.xulkaquraada.app.audio',
+      androidNotificationChannelId: 'com.xulkaquraada.mobile.audio',
       androidNotificationChannelName: 'Xulka Quraada Playback',
       androidNotificationOngoing: true,
       androidStopForegroundOnPause: true,

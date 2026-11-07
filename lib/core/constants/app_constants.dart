@@ -9,14 +9,14 @@ class AppConstants {
   /// Production APKs use the live API by default.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://qaari.mahaysaa.com',
+    defaultValue: 'https://www.xulkaquraada.com',
   );
 
   /// Public website origin for share links (`/listen/{id}`).
   /// Defaults to the same host as [apiBaseUrl] (no `/api` path).
   static const String webBaseUrl = String.fromEnvironment(
     'WEB_BASE_URL',
-    defaultValue: 'https://qaari.mahaysaa.com',
+    defaultValue: 'https://www.xulkaquraada.com',
   );
 
   static const String apiPrefix = '/api/v1';
@@ -42,7 +42,7 @@ class AppConstants {
 
   static String get privacyPolicyUrl => '${resolvedWebBaseUrl}/privacy';
 
-  /// Google Play listing (package `com.xulkaquraada.app`).
+  /// Google Play listing (package `com.xulkaquraada.mobile`).
   static const String playStoreUrl =
-      'https://play.google.com/store/apps/details?id=com.xulkaquraada.app';
+      'https://play.google.com/store/apps/details?id=com.xulkaquraada.mobile';
 }

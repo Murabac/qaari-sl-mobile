@@ -1,4 +1,4 @@
-package com.xulkaquraada.app
+package com.xulkaquraada.mobile
 
 import android.graphics.Color
 import android.os.Bundle
