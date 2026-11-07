@@ -1,6 +1,3 @@
-import 'dart:ui';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
@@ -84,23 +81,7 @@ class _NowPlayingScreenState extends ConsumerState<NowPlayingScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          if ((track.reciterPhotoUrl ?? '').isNotEmpty)
-            ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-              child: Transform.scale(
-                scale: 1.15,
-                child: CachedNetworkImage(
-                  imageUrl: track.reciterPhotoUrl!,
-                  fit: BoxFit.cover,
-                  color: Colors.black.withValues(alpha: 0.35),
-                  colorBlendMode: BlendMode.darken,
-                  errorWidget: (_, _, _) =>
-                      const ColoredBox(color: AppColors.deep),
-                ),
-              ),
-            )
-          else
-            const ColoredBox(color: AppColors.deep),
+          const ColoredBox(color: AppColors.deep),
           Container(color: const Color(0xD1062423)),
           SafeArea(
             child: Column(

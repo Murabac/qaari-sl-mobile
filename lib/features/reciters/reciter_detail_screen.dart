@@ -1,9 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
 import 'package:qaari_sl_mobile/core/data/catalog_repository.dart';
 import 'package:qaari_sl_mobile/core/data/library_repository.dart';
 import 'package:qaari_sl_mobile/core/models/recitation.dart';
+import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/share/share_recitation.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
@@ -12,6 +13,7 @@ import 'package:qaari_sl_mobile/features/downloads/downloads_screen.dart';
 import 'package:qaari_sl_mobile/features/player/open_player.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/playlists/add_to_playlist_sheet.dart';
+import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class ReciterDetailScreen extends ConsumerWidget {
@@ -27,9 +29,7 @@ class ReciterDetailScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: asyncReciter.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
-        ),
+        loading: () => const QaariLoadingSkeleton(),
         error: (error, _) => AsyncBody(
           isLoading: false,
           error: error,
@@ -49,15 +49,7 @@ class ReciterDetailScreen extends ConsumerWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      if ((reciter.photoUrl ?? '').isNotEmpty)
-                        CachedNetworkImage(
-                          imageUrl: reciter.photoUrl!,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, _, _) =>
-                              const ColoredBox(color: AppColors.forest),
-                        )
-                      else
-                        const ColoredBox(color: AppColors.forest),
+                      const ColoredBox(color: AppColors.forest),
                       const DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -113,6 +105,8 @@ class ReciterDetailScreen extends ConsumerWidget {
                                 ],
                               ),
                             ),
+                            const SizedBox(width: 8),
+                            _FollowReciterButton(reciter: reciter),
                           ],
                         ),
                       ),
@@ -404,6 +398,85 @@ class _SurahRow extends ConsumerWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _FollowReciterButton extends ConsumerStatefulWidget {
+  const _FollowReciterButton({required this.reciter});
+
+  final Reciter reciter;
+
+  @override
+  ConsumerState<_FollowReciterButton> createState() =>
+      _FollowReciterButtonState();
+}
+
+class _FollowReciterButtonState extends ConsumerState<_FollowReciterButton> {
+  late bool _followed = widget.reciter.followed;
+  var _busy = false;
+
+  @override
+  void didUpdateWidget(covariant _FollowReciterButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.reciter.followed != widget.reciter.followed) {
+      _followed = widget.reciter.followed;
+    }
+  }
+
+  Future<void> _toggle() async {
+    if (_busy) return;
+    final auth = ref.read(authControllerProvider);
+    if (!auth.isAuthenticated) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(builder: (_) => const LoginScreen()),
+      );
+      return;
+    }
+    final previous = _followed;
+    setState(() {
+      _busy = true;
+      _followed = !previous;
+    });
+    try {
+      final repo = ref.read(catalogRepositoryProvider);
+      final saved = previous
+          ? await repo.unfollowReciter(widget.reciter.id)
+          : await repo.followReciter(widget.reciter.id);
+      if (!mounted) return;
+      setState(() => _followed = saved.followed);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _followed = previous);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).momentsFollowFailed),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return TextButton(
+      onPressed: _toggle,
+      style: TextButton.styleFrom(
+        backgroundColor: _followed ? AppColors.gold : Colors.transparent,
+        foregroundColor: _followed ? AppColors.deep : AppColors.gold,
+        minimumSize: const Size(44, 44),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999),
+          side: const BorderSide(color: AppColors.gold),
+        ),
+      ),
+      child: Text(
+        _followed ? l10n.momentsFollowingLabel : l10n.momentsFollow,
+        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/player/now_playing_screen.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
@@ -33,11 +34,11 @@ class MiniPlayerBar extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () => _openPlayer(context),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           child: Ink(
             decoration: BoxDecoration(
               color: AppColors.forest.withValues(alpha: 0.95),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.card),
               border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
               boxShadow: AppColors.miniPlayerShadow,
             ),

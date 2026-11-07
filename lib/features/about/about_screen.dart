@@ -4,6 +4,7 @@ import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/data/story_repository.dart';
 import 'package:qaari_sl_mobile/core/models/story.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class AboutScreen extends ConsumerWidget {
@@ -16,9 +17,7 @@ class AboutScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: AppColors.cream,
       body: asyncStory.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
-        ),
+        loading: () => const QaariLoadingSkeleton(),
         error: (error, _) => AsyncBody(
           isLoading: false,
           error: error,
@@ -209,9 +208,7 @@ class CreditsScreen extends ConsumerWidget {
       backgroundColor: AppColors.cream,
       appBar: AppBar(title: const Text('Credits')),
       body: asyncStory.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
-        ),
+        loading: () => const QaariLoadingSkeleton(),
         error: (error, _) => AsyncBody(
           isLoading: false,
           error: error,
@@ -377,7 +374,7 @@ class _BoardRow extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.creamCard,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         boxShadow: AppColors.cardShadow,
       ),
       child: Row(
@@ -423,7 +420,7 @@ class _TeamRow extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.creamCard,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         boxShadow: AppColors.cardShadow,
       ),
       child: Row(

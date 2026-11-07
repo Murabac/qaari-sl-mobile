@@ -5,6 +5,7 @@ import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/data/catalog_repository.dart';
 import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/reciters/reciter_detail_screen.dart';
 import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
@@ -94,11 +95,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               greetingSmall: _greetingSmall(languageCode),
               greetingTitle: _greetingTitle(languageCode),
             ),
-            const Expanded(
-              child: Center(
-                child: CircularProgressIndicator(color: AppColors.gold),
-              ),
-            ),
+            const Expanded(child: QaariLoadingSkeleton()),
           ],
         ),
         error: (error, _) => Column(
@@ -431,7 +428,7 @@ class _FeaturedCard extends StatelessWidget {
         width: 256,
         decoration: BoxDecoration(
           color: AppColors.creamCard,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.card),
           border: Border.all(color: AppColors.border),
           boxShadow: AppColors.cardShadow,
         ),
@@ -445,10 +442,11 @@ class _FeaturedCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
+                    const ColoredBox(color: AppColors.forest),
                     if ((reciter.photoUrl ?? '').isNotEmpty)
                       CachedNetworkImage(
                         imageUrl: reciter.photoUrl!,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
                         errorWidget: (_, _, _) =>
                             const ColoredBox(color: AppColors.forest),
                       )
@@ -584,13 +582,13 @@ class _ReciterRow extends StatelessWidget {
 
     return Material(
       color: AppColors.creamCard,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.card),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         child: Ink(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.card),
             border: Border.all(color: AppColors.border),
             boxShadow: AppColors.cardShadow,
           ),

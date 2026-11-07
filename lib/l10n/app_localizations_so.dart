@@ -27,6 +27,79 @@ class AppLocalizationsSo extends AppLocalizations {
   String get momentsEmpty => 'Weli ma jiro Dhaqdho. Markale soo noqo.';
 
   @override
+  String get momentsLikeFailed => 'Jecel ahaanshaha lama cusboonaysiin karo';
+
+  @override
+  String get momentsAyah => 'Aayad';
+
+  @override
+  String get momentsSound => 'Cod';
+
+  @override
+  String get momentsMuted => 'Aamusin';
+
+  @override
+  String get momentsRetry => 'Isku day mar kale';
+
+  @override
+  String get momentsLoadFailed => 'Dhaqdho lama soo rari karo';
+
+  @override
+  String get momentsLatest => 'Ugu dambeeyay';
+
+  @override
+  String get momentsTrending => 'Caan';
+
+  @override
+  String get momentsFollowing => 'Raacitaan';
+
+  @override
+  String get momentsSaved => 'Kaydsan';
+
+  @override
+  String get momentsFollow => 'Raac';
+
+  @override
+  String get momentsFollowingLabel => 'Waa la raacay';
+
+  @override
+  String get momentsSave => 'Kaydi';
+
+  @override
+  String get momentsSavedLabel => 'Kaydsan';
+
+  @override
+  String get momentsComment => 'Faallo';
+
+  @override
+  String get momentsCommentHint => 'Qor faallo gaaban';
+
+  @override
+  String get momentsCommentEmpty => 'Weli faallo ma jirto';
+
+  @override
+  String get momentsSend => 'Dir';
+
+  @override
+  String get momentsSaveFailed => 'Kaydka lama cusboonaysiin karo';
+
+  @override
+  String get momentsCommentFailed => 'Faallada lama cusboonaysiin karo';
+
+  @override
+  String get momentsFollowFailed => 'Raacidda lama cusboonaysiin karo';
+
+  @override
+  String get momentsSearch => 'Raadi Dhaqdho';
+
+  @override
+  String get momentsFollowingEmpty =>
+      'Raac qaari si aad halkan uga aragto dhaqdhihiisa.';
+
+  @override
+  String get momentsSavedEmpty => 'Dhaqdhaadha kaydsan waa kuwaaga keliya.';
+
+  @override
   String get featuredReciters => 'Qaariyada la soo bandhigay';
 
   @override

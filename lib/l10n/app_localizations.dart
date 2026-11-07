@@ -136,6 +136,150 @@ abstract class AppLocalizations {
   /// **'No Moments yet. Check back soon.'**
   String get momentsEmpty;
 
+  /// No description provided for @momentsLikeFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update like'**
+  String get momentsLikeFailed;
+
+  /// No description provided for @momentsAyah.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayah'**
+  String get momentsAyah;
+
+  /// No description provided for @momentsSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get momentsSound;
+
+  /// No description provided for @momentsMuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Muted'**
+  String get momentsMuted;
+
+  /// No description provided for @momentsRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get momentsRetry;
+
+  /// No description provided for @momentsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load Moments'**
+  String get momentsLoadFailed;
+
+  /// No description provided for @momentsLatest.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest'**
+  String get momentsLatest;
+
+  /// No description provided for @momentsTrending.
+  ///
+  /// In en, this message translates to:
+  /// **'Trending'**
+  String get momentsTrending;
+
+  /// No description provided for @momentsFollowing.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get momentsFollowing;
+
+  /// No description provided for @momentsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get momentsSaved;
+
+  /// No description provided for @momentsFollow.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow'**
+  String get momentsFollow;
+
+  /// No description provided for @momentsFollowingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Following'**
+  String get momentsFollowingLabel;
+
+  /// No description provided for @momentsSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get momentsSave;
+
+  /// No description provided for @momentsSavedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get momentsSavedLabel;
+
+  /// No description provided for @momentsComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get momentsComment;
+
+  /// No description provided for @momentsCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a short note'**
+  String get momentsCommentHint;
+
+  /// No description provided for @momentsCommentEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet'**
+  String get momentsCommentEmpty;
+
+  /// No description provided for @momentsSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get momentsSend;
+
+  /// No description provided for @momentsSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update save'**
+  String get momentsSaveFailed;
+
+  /// No description provided for @momentsCommentFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update comment'**
+  String get momentsCommentFailed;
+
+  /// No description provided for @momentsFollowFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update follow'**
+  String get momentsFollowFailed;
+
+  /// No description provided for @momentsSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Moments'**
+  String get momentsSearch;
+
+  /// No description provided for @momentsFollowingEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow a reciter to see their Moments here.'**
+  String get momentsFollowingEmpty;
+
+  /// No description provided for @momentsSavedEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Moments stay on this phone, just for you.'**
+  String get momentsSavedEmpty;
+
   /// No description provided for @featuredReciters.
   ///
   /// In en, this message translates to:

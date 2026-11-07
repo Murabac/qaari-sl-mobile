@@ -86,9 +86,7 @@ class PlaylistsScreen extends ConsumerWidget {
                     ),
                   )
                 : asyncPlaylists.when(
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(color: AppColors.gold),
-                    ),
+                    loading: () => const QaariLoadingSkeleton(),
                     error: (error, _) => AsyncBody(
                       isLoading: false,
                       error: error,

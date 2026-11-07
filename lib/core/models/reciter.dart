@@ -12,6 +12,7 @@ class Reciter {
     required this.photoUrl,
     required this.region,
     required this.approvedRecitationsCount,
+    this.followed = false,
     this.recitations = const [],
   });
 
@@ -25,6 +26,7 @@ class Reciter {
   final String? photoUrl;
   final String? region;
   final int approvedRecitationsCount;
+  final bool followed;
   final List<Recitation> recitations;
 
   factory Reciter.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class Reciter {
       region: json['region'] as String?,
       approvedRecitationsCount:
           (json['approved_recitations_count'] as num?)?.toInt() ?? 0,
+      followed: json['followed'] == true,
       recitations: recitationsJson is List
           ? recitationsJson
               .whereType<Map<String, dynamic>>()

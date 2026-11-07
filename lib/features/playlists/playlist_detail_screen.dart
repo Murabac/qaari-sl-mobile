@@ -26,9 +26,7 @@ class PlaylistDetailScreen extends ConsumerWidget {
         ),
       ),
       body: asyncPlaylist.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.gold),
-        ),
+        loading: () => const QaariLoadingSkeleton(),
         error: (error, _) => AsyncBody(
           isLoading: false,
           error: error,

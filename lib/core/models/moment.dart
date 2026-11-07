@@ -12,8 +12,15 @@ class Moment {
     required this.videoUrl,
     required this.posterUrl,
     required this.duration,
+    required this.width,
+    required this.height,
     required this.likesCount,
     required this.liked,
+    required this.savesCount,
+    required this.saved,
+    required this.commentsCount,
+    required this.followedReciter,
+    required this.hashtags,
     required this.linkedRecitationId,
     this.reciter,
     this.surah,
@@ -28,8 +35,15 @@ class Moment {
   final String? videoUrl;
   final String? posterUrl;
   final int? duration;
+  final int? width;
+  final int? height;
   final int likesCount;
   final bool liked;
+  final int savesCount;
+  final bool saved;
+  final int commentsCount;
+  final bool followedReciter;
+  final List<String> hashtags;
   final int? linkedRecitationId;
   final Reciter? reciter;
   final Surah? surah;
@@ -47,8 +61,17 @@ class Moment {
       videoUrl: json['video_url'] as String?,
       posterUrl: json['poster_url'] as String?,
       duration: (json['duration'] as num?)?.toInt(),
+      width: (json['width'] as num?)?.toInt(),
+      height: (json['height'] as num?)?.toInt(),
       likesCount: (json['likes_count'] as num?)?.toInt() ?? 0,
       liked: json['liked'] == true,
+      savesCount: (json['saves_count'] as num?)?.toInt() ?? 0,
+      saved: json['saved'] == true,
+      commentsCount: (json['comments_count'] as num?)?.toInt() ?? 0,
+      followedReciter: json['followed_reciter'] == true,
+      hashtags: json['hashtags'] is List
+          ? (json['hashtags'] as List).whereType<String>().toList()
+          : const [],
       linkedRecitationId: (json['linked_recitation_id'] as num?)?.toInt(),
       reciter: reciterJson is Map<String, dynamic>
           ? Reciter.fromJson(reciterJson)
@@ -62,6 +85,10 @@ class Moment {
   Moment copyWith({
     bool? liked,
     int? likesCount,
+    bool? saved,
+    int? savesCount,
+    int? commentsCount,
+    bool? followedReciter,
   }) {
     return Moment(
       id: id,
@@ -73,11 +100,41 @@ class Moment {
       videoUrl: videoUrl,
       posterUrl: posterUrl,
       duration: duration,
+      width: width,
+      height: height,
       likesCount: likesCount ?? this.likesCount,
       liked: liked ?? this.liked,
+      savesCount: savesCount ?? this.savesCount,
+      saved: saved ?? this.saved,
+      commentsCount: commentsCount ?? this.commentsCount,
+      followedReciter: followedReciter ?? this.followedReciter,
+      hashtags: hashtags,
       linkedRecitationId: linkedRecitationId,
       reciter: reciter,
       surah: surah,
+    );
+  }
+}
+
+class MomentComment {
+  const MomentComment({
+    required this.id,
+    required this.body,
+    required this.userName,
+    required this.mine,
+  });
+
+  final int id;
+  final String body;
+  final String userName;
+  final bool mine;
+
+  factory MomentComment.fromJson(Map<String, dynamic> json) {
+    return MomentComment(
+      id: (json['id'] as num).toInt(),
+      body: (json['body'] as String?) ?? '',
+      userName: (json['user_name'] as String?) ?? '',
+      mine: json['mine'] == true,
     );
   }
 }

@@ -27,6 +27,80 @@ class AppLocalizationsEn extends AppLocalizations {
   String get momentsEmpty => 'No Moments yet. Check back soon.';
 
   @override
+  String get momentsLikeFailed => 'Could not update like';
+
+  @override
+  String get momentsAyah => 'Ayah';
+
+  @override
+  String get momentsSound => 'Sound';
+
+  @override
+  String get momentsMuted => 'Muted';
+
+  @override
+  String get momentsRetry => 'Try again';
+
+  @override
+  String get momentsLoadFailed => 'Could not load Moments';
+
+  @override
+  String get momentsLatest => 'Latest';
+
+  @override
+  String get momentsTrending => 'Trending';
+
+  @override
+  String get momentsFollowing => 'Following';
+
+  @override
+  String get momentsSaved => 'Saved';
+
+  @override
+  String get momentsFollow => 'Follow';
+
+  @override
+  String get momentsFollowingLabel => 'Following';
+
+  @override
+  String get momentsSave => 'Save';
+
+  @override
+  String get momentsSavedLabel => 'Saved';
+
+  @override
+  String get momentsComment => 'Comment';
+
+  @override
+  String get momentsCommentHint => 'Write a short note';
+
+  @override
+  String get momentsCommentEmpty => 'No comments yet';
+
+  @override
+  String get momentsSend => 'Send';
+
+  @override
+  String get momentsSaveFailed => 'Could not update save';
+
+  @override
+  String get momentsCommentFailed => 'Could not update comment';
+
+  @override
+  String get momentsFollowFailed => 'Could not update follow';
+
+  @override
+  String get momentsSearch => 'Search Moments';
+
+  @override
+  String get momentsFollowingEmpty =>
+      'Follow a reciter to see their Moments here.';
+
+  @override
+  String get momentsSavedEmpty =>
+      'Saved Moments stay on this phone, just for you.';
+
+  @override
   String get featuredReciters => 'Featured Reciters';
 
   @override

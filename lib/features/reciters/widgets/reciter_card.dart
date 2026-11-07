@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class ReciterCard extends StatelessWidget {
@@ -24,11 +25,11 @@ class ReciterCard extends StatelessWidget {
       elevation: 0,
       color: AppColors.creamCard,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         side: const BorderSide(color: AppColors.border),
       ),
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.card),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(14),

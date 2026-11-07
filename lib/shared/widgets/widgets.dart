@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/shared/widgets/design_primitives.dart';
 import 'package:qaari_sl_mobile/shared/widgets/qaari_logo.dart';
 
@@ -30,9 +31,7 @@ class AsyncBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(color: AppColors.gold),
-      );
+      return const QaariLoadingSkeleton();
     }
 
     if (error != null) {
@@ -86,6 +85,28 @@ class AsyncBody extends StatelessWidget {
     }
 
     return child;
+  }
+}
+
+class QaariLoadingSkeleton extends StatelessWidget {
+  const QaariLoadingSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(AppSpacing.page),
+      itemCount: 4,
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      itemBuilder: (_, _) => Container(
+        height: 84,
+        decoration: BoxDecoration(
+          color: AppColors.creamSurface,
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          border: Border.all(color: AppColors.border),
+        ),
+      ),
+    );
   }
 }
 

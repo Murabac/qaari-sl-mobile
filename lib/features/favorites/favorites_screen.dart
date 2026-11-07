@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
 import 'package:qaari_sl_mobile/core/data/library_repository.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
 import 'package:qaari_sl_mobile/features/player/open_player.dart';
@@ -73,7 +74,7 @@ class FavoritesScreen extends ConsumerWidget {
                           return Container(
                             decoration: BoxDecoration(
                               color: AppColors.creamCard,
-                              borderRadius: BorderRadius.circular(18),
+                              borderRadius: BorderRadius.circular(AppRadius.card),
                               boxShadow: AppColors.cardShadow,
                             ),
                             padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),

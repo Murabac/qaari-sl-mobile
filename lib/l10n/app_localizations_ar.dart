@@ -27,6 +27,78 @@ class AppLocalizationsAr extends AppLocalizations {
   String get momentsEmpty => 'لا لحظات بعد. عد قريبًا.';
 
   @override
+  String get momentsLikeFailed => 'تعذر تحديث الإعجاب';
+
+  @override
+  String get momentsAyah => 'آية';
+
+  @override
+  String get momentsSound => 'الصوت';
+
+  @override
+  String get momentsMuted => 'صامت';
+
+  @override
+  String get momentsRetry => 'حاول مرة أخرى';
+
+  @override
+  String get momentsLoadFailed => 'تعذر تحميل اللحظات';
+
+  @override
+  String get momentsLatest => 'الأحدث';
+
+  @override
+  String get momentsTrending => 'الرائج';
+
+  @override
+  String get momentsFollowing => 'المتابَعون';
+
+  @override
+  String get momentsSaved => 'المحفوظ';
+
+  @override
+  String get momentsFollow => 'متابعة';
+
+  @override
+  String get momentsFollowingLabel => 'تتابعه';
+
+  @override
+  String get momentsSave => 'حفظ';
+
+  @override
+  String get momentsSavedLabel => 'محفوظ';
+
+  @override
+  String get momentsComment => 'تعليق';
+
+  @override
+  String get momentsCommentHint => 'اكتب ملاحظة قصيرة';
+
+  @override
+  String get momentsCommentEmpty => 'لا تعليقات بعد';
+
+  @override
+  String get momentsSend => 'إرسال';
+
+  @override
+  String get momentsSaveFailed => 'تعذر تحديث الحفظ';
+
+  @override
+  String get momentsCommentFailed => 'تعذر تحديث التعليق';
+
+  @override
+  String get momentsFollowFailed => 'تعذر تحديث المتابعة';
+
+  @override
+  String get momentsSearch => 'ابحث في اللحظات';
+
+  @override
+  String get momentsFollowingEmpty => 'تابع قارئاً لترى لحظاته هنا.';
+
+  @override
+  String get momentsSavedEmpty => 'اللحظات المحفوظة خاصة بك.';
+
+  @override
   String get featuredReciters => 'قراء مميزون';
 
   @override
