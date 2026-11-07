@@ -23,7 +23,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _scrollController = ScrollController();
   final _allRecitersKey = GlobalKey();
   String _query = '';
-  int _riwayahFilter = 0;
 
   @override
   void dispose() {
@@ -39,13 +38,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return all.take(5).toList();
   }
 
-  List<Reciter> _applyRiwayahFilter(List<Reciter> reciters) {
-    if (_riwayahFilter == 0) return reciters;
-    final needle = _riwayahFilter == 1 ? 'hafs' : 'duri';
-    return reciters.where((r) {
-      final haystack =
-          '${r.region ?? ''} ${r.nameEnglish} ${r.bioEnglish}'.toLowerCase();
-      return haystack.contains(needle);
+  List<Reciter> _matching(List<Reciter> reciters) {
+    final query = _query.trim().toLowerCase();
+    if (query.isEmpty) return reciters;
+    return reciters.where((reciter) {
+      final haystack = '${reciter.nameSomali} ${reciter.nameArabic} '
+              '${reciter.nameEnglish} ${reciter.region ?? ''}'
+          .toLowerCase();
+      return haystack.contains(query);
     }).toList();
   }
 
@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
-    final asyncReciters = ref.watch(recitersProvider(_query));
+    final asyncReciters = ref.watch(recitersProvider(''));
     final l10n = AppLocalizations.of(context);
 
     return ColoredBox(
@@ -114,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     '$error\n\n'
                     'API: ${AppConstants.apiBaseUrl}${AppConstants.apiPrefix}',
                 isEmpty: false,
-                onRetry: () => ref.invalidate(recitersProvider(_query)),
+                onRetry: () => ref.invalidate(recitersProvider('')),
                 child: const SizedBox.shrink(),
               ),
             ),
@@ -122,12 +122,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
         data: (reciters) {
           final featured = _featured(reciters);
-          final filtered = _applyRiwayahFilter(reciters);
+          final filtered = _matching(reciters);
 
           return RefreshIndicator(
             color: AppColors.gold,
-            onRefresh: () async =>
-                ref.invalidate(recitersProvider(_query)),
+            onRefresh: () async => ref.invalidate(recitersProvider('')),
             child: CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -213,20 +212,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ],
                 SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 10),
-                    child: QaariSegmentedBar(
-                      labels: const ['All Riwayah', 'Hafs', 'Duri'],
-                      selectedIndex: _riwayahFilter,
-                      onSelected: (value) =>
-                          setState(() => _riwayahFilter = value),
-                    ),
-                  ),
-                ),
-                SliverToBoxAdapter(
                   key: _allRecitersKey,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 12),
                     child: Row(
                       children: [
                         Expanded(
