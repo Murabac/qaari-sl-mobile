@@ -20,7 +20,6 @@ class PlaylistsScreen extends ConsumerWidget {
     return Column(
       children: [
         ForestPageHeader(
-          eyebrow: 'Your Collections',
           title: 'Playlists',
           subtitle: auth.isAuthenticated
               ? asyncPlaylists.maybeWhen(
@@ -77,8 +76,10 @@ class PlaylistsScreen extends ConsumerWidget {
                             ),
                           ),
                           style: FilledButton.styleFrom(
-                            backgroundColor: AppColors.gold,
-                            foregroundColor: AppColors.forest,
+                            backgroundColor: const Color(0xFFC6A15B),
+                            foregroundColor: AppColors.deep,
+                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                            shape: const StadiumBorder(),
                           ),
                           child: const Text('Log in'),
                         ),
@@ -196,52 +197,49 @@ class _PlaylistCard extends StatelessWidget {
             ],
           ),
           clipBehavior: Clip.antiAlias,
+          color: Colors.white,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                color: AppColors.forest,
-                padding: const EdgeInsets.fromLTRB(16, 14, 8, 14),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 8, 0),
                 child: Row(
                   children: [
                     Container(
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: AppColors.gold.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(13),
+                        color: const Color(0xFF0D3B2E),
+                        borderRadius: BorderRadius.circular(14),
                       ),
                       child: const Icon(
                         Icons.queue_music_rounded,
-                        color: AppColors.gold,
+                        color: Color(0xFFE8C882),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            playlist.name,
-                            style: const TextStyle(
-                              color: AppColors.cream,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          Text(
-                            '${playlist.itemsCount} tracks',
-                            style: const TextStyle(
-                              color: AppColors.gold,
-                              fontSize: 11,
-                            ),
-                          ),
-                        ],
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF6E7C3),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        'Playlist',
+                        style: AppTheme.sans(
+                          fontSize: 10,
+                          color: const Color(0xFF8A6A2F),
+                          weight: FontWeight.w800,
+                        ),
                       ),
                     ),
                     PopupMenuButton<String>(
                       icon: const Icon(
                         Icons.more_vert_rounded,
-                        color: AppColors.cream,
+                        color: AppColors.muted,
                       ),
                       onSelected: (value) {
                         if (value == 'rename') onRename();
@@ -251,6 +249,43 @@ class _PlaylistCard extends StatelessWidget {
                         PopupMenuItem(value: 'rename', child: Text('Rename')),
                         PopupMenuItem(value: 'delete', child: Text('Delete')),
                       ],
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                child: Text(
+                  playlist.name,
+                  style: AppTheme.sans(fontSize: 18, weight: FontWeight.w800),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${playlist.itemsCount} Recitations',
+                        style: AppTheme.sans(
+                          fontSize: 12,
+                          color: AppColors.muted,
+                          weight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF0D3B2E),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: Color(0xFFE8C882),
+                        size: 20,
+                      ),
                     ),
                   ],
                 ),

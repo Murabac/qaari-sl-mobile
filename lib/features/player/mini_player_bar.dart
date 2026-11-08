@@ -4,8 +4,11 @@ import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
+import 'package:qaari_sl_mobile/core/models/reciter.dart';
+import 'package:qaari_sl_mobile/features/follow_along/follow_along_screen.dart';
 import 'package:qaari_sl_mobile/features/player/now_playing_screen.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
+import 'package:qaari_sl_mobile/shared/widgets/reciter_portrait.dart';
 
 class MiniPlayerBar extends ConsumerWidget {
   const MiniPlayerBar({super.key});
@@ -22,7 +25,19 @@ class MiniPlayerBar extends ConsumerWidget {
     final title = track.surah?.localizedName(languageCode) ??
         'Surah ${track.surahId}';
     final artist = track.reciterName ?? AppConstants.appName;
-    final surahNumber = track.surah?.number ?? track.surahId;
+    final arabic = track.surah?.nameArabic ?? '';
+    final face = Reciter(
+      id: track.reciterId,
+      nameSomali: track.reciterName ?? '',
+      nameArabic: '',
+      nameEnglish: track.reciterName ?? '',
+      bioSomali: '',
+      bioArabic: '',
+      bioEnglish: '',
+      photoUrl: track.reciterPhotoUrl,
+      region: null,
+      approvedRecitationsCount: 0,
+    );
     final progress = player.duration.inMilliseconds == 0
         ? 0.0
         : (player.position.inMilliseconds / player.duration.inMilliseconds)
@@ -60,25 +75,11 @@ class MiniPlayerBar extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
                   child: Row(
                     children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: AppColors.deep,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.gold.withValues(alpha: 0.45),
-                          ),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          '$surahNumber',
-                          style: AppTheme.displayFont(
-                            fontSize: 16,
-                            color: AppColors.goldLight,
-                            weight: FontWeight.w700,
-                          ),
-                        ),
+                      ReciterFace(
+                        reciter: face,
+                        size: 44,
+                        borderRadius: BorderRadius.circular(12),
+                        nameForFallback: artist,
                       ),
                       const SizedBox(width: 10),
                       Expanded(
@@ -90,11 +91,22 @@ class MiniPlayerBar extends ConsumerWidget {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTheme.displayFont(
-                                fontSize: 15,
+                                fontSize: 14,
                                 color: AppColors.cream,
                                 weight: FontWeight.w600,
                               ),
                             ),
+                            if (arabic.isNotEmpty)
+                              Text(
+                                arabic,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textDirection: TextDirection.rtl,
+                                style: AppTheme.displayFont(
+                                  fontSize: 12,
+                                  color: AppColors.goldLight,
+                                ),
+                              ),
                             Text(
                               artist,
                               maxLines: 1,
@@ -108,6 +120,39 @@ class MiniPlayerBar extends ConsumerWidget {
                           ],
                         ),
                       ),
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) =>
+                                  FollowAlongScreen(recitationId: track.id),
+                            ),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.goldLight,
+                          side: BorderSide(
+                            color: AppColors.gold.withValues(alpha: 0.55),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: const Size(0, 32),
+                        ),
+                        child: Text(
+                          switch (languageCode) {
+                            'ar' => 'تابع',
+                            'so' => 'La soco',
+                            _ => 'Follow',
+                          },
+                          style: AppTheme.sans(
+                            fontSize: 11,
+                            color: AppColors.goldLight,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
                       IconButton(
                         visualDensity: VisualDensity.compact,
                         onPressed: () => ref
@@ -121,9 +166,12 @@ class MiniPlayerBar extends ConsumerWidget {
                         ),
                         style: IconButton.styleFrom(
                           backgroundColor: AppColors.gold,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           minimumSize: const Size(36, 36),
+                          fixedSize: const Size(36, 36),
                         ),
                       ),
+                      const SizedBox(width: 6),
                       IconButton(
                         visualDensity: VisualDensity.compact,
                         onPressed: () => ref
@@ -134,14 +182,10 @@ class MiniPlayerBar extends ConsumerWidget {
                           color: AppColors.mutedOnDark,
                           size: 22,
                         ),
-                      ),
-                      IconButton(
-                        visualDensity: VisualDensity.compact,
-                        onPressed: () => _openPlayer(context),
-                        icon: const Icon(
-                          Icons.keyboard_arrow_up_rounded,
-                          color: AppColors.mutedOnDark,
-                          size: 22,
+                        style: IconButton.styleFrom(
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          minimumSize: const Size(32, 36),
+                          padding: EdgeInsets.zero,
                         ),
                       ),
                     ],

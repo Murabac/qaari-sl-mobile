@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/data/catalog_repository.dart';
+import 'package:qaari_sl_mobile/core/models/recitation.dart';
 import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
+import 'package:qaari_sl_mobile/core/data/library_repository.dart';
+import 'package:qaari_sl_mobile/features/player/open_player.dart';
 import 'package:qaari_sl_mobile/features/reciters/reciter_detail_screen.dart';
 import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 import 'package:qaari_sl_mobile/shared/widgets/reciter_portrait.dart';
@@ -24,6 +27,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _scrollController = ScrollController();
   final _allRecitersKey = GlobalKey();
   String _query = '';
+  String _region = '';
 
   @override
   void dispose() {
@@ -41,13 +45,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   List<Reciter> _matching(List<Reciter> reciters) {
     final query = _query.trim().toLowerCase();
-    if (query.isEmpty) return reciters;
     return reciters.where((reciter) {
+      if (_region.isNotEmpty && (reciter.region ?? '') != _region) {
+        return false;
+      }
+      if (query.isEmpty) return true;
       final haystack = '${reciter.nameSomali} ${reciter.nameArabic} '
-              '${reciter.nameEnglish} ${reciter.region ?? ''}'
+              '${reciter.nameEnglish} ${reciter.bioSomali} ${reciter.bioEnglish} '
+              '${reciter.region ?? ''}'
           .toLowerCase();
       return haystack.contains(query);
     }).toList();
+  }
+
+  List<String> _regions(List<Reciter> reciters) {
+    final names = <String>{
+      for (final reciter in reciters)
+        if ((reciter.region ?? '').trim().isNotEmpty) reciter.region!.trim(),
+    };
+    final list = names.toList()..sort();
+    return list;
   }
 
   void _scrollToAllReciters() {
@@ -62,27 +79,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  String _greetingSmall(String lang) {
-    return switch (lang) {
-      'ar' => 'السلام عليكم ورحمة الله',
-      'so' => 'Assalaamu Calaykum',
-      _ => 'Peace and Blessings',
-    };
-  }
-
-  String _greetingTitle(String lang) {
-    return switch (lang) {
-      'ar' => 'طِبْتُمْ وَطَابَ مَمْشَاكُمْ',
-      'so' => 'Kusoo Dhawoow Xulka Quraada',
-      _ => 'Listen with Khushuu\'',
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     final languageCode = Localizations.localeOf(context).languageCode;
     final asyncReciters = ref.watch(recitersProvider(''));
     final l10n = AppLocalizations.of(context);
+    final searchHint = switch (languageCode) {
+      'ar' => 'ابحث عن قارئ أو سورة…',
+      'so' => 'Raadi quraa, suurad, gobol...',
+      _ => 'Search reciters, surahs, region...',
+    };
 
     return ColoredBox(
       color: AppColors.cream,
@@ -92,9 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HomeBrandHeader(
               searchController: _searchController,
               onSearchChanged: (value) => setState(() => _query = value),
-              searchHint: l10n.searchReciters,
-              greetingSmall: _greetingSmall(languageCode),
-              greetingTitle: _greetingTitle(languageCode),
+              searchHint: searchHint,
             ),
             const Expanded(child: QaariLoadingSkeleton()),
           ],
@@ -104,9 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             HomeBrandHeader(
               searchController: _searchController,
               onSearchChanged: (value) => setState(() => _query = value),
-              searchHint: l10n.searchReciters,
-              greetingSmall: _greetingSmall(languageCode),
-              greetingTitle: _greetingTitle(languageCode),
+              searchHint: searchHint,
             ),
             Expanded(
               child: AsyncBody(
@@ -122,8 +124,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         data: (reciters) {
-          final featured = _featured(reciters);
           final filtered = _matching(reciters);
+          final featured = _featured(filtered);
+          final regions = _regions(reciters);
+          final saved = ref.watch(favoritesControllerProvider).tracks;
 
           return RefreshIndicator(
             color: AppColors.gold,
@@ -135,20 +139,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: HomeBrandHeader(
                     searchController: _searchController,
                     onSearchChanged: (value) => setState(() => _query = value),
-                    searchHint: l10n.searchReciters,
-                    greetingSmall: _greetingSmall(languageCode),
-                    greetingTitle: _greetingTitle(languageCode),
+                    searchHint: searchHint,
                   ),
                 ),
-                if (_query.isEmpty)
+                if (_query.isEmpty && regions.isNotEmpty)
                   SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-                      child: _DailyReflectionCard(
-                        languageCode: languageCode,
-                        onExplore: featured.isNotEmpty
-                            ? () => _open(featured.first.id)
-                            : _scrollToAllReciters,
+                    child: SizedBox(
+                      height: 48,
+                      child: ListView(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        children: [
+                          _RegionChip(
+                            label: switch (languageCode) {
+                              'ar' => 'الكل',
+                              'so' => 'Dhammaan',
+                              _ => 'All',
+                            },
+                            selected: _region.isEmpty,
+                            onTap: () => setState(() => _region = ''),
+                          ),
+                          for (final region in regions)
+                            _RegionChip(
+                              label: region,
+                              selected: _region == region,
+                              onTap: () => setState(() => _region = region),
+                            ),
+                        ],
                       ),
                     ),
                   ),
@@ -163,16 +180,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  l10n.featuredReciters,
-                                  style: AppTheme.displayFont(fontSize: 20),
-                                ),
-                                Text(
-                                  'Curated masters · Studio recordings',
-                                  style: AppTheme.sans(
-                                    fontSize: 11,
-                                    color: AppColors.muted,
-                                  ),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.auto_awesome_rounded,
+                                      size: 16,
+                                      color: Color(0xFFB88E2D),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        l10n.featuredReciters,
+                                        style: AppTheme.sans(
+                                          fontSize: 16,
+                                          weight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -194,7 +219,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   SliverToBoxAdapter(
                     child: SizedBox(
-                      height: 210,
+                      height: 320,
                       child: ListView.separated(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         scrollDirection: Axis.horizontal,
@@ -219,13 +244,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: Text(
-                            _query.isEmpty ? l10n.allReciters : l10n.results,
-                            style: AppTheme.displayFont(fontSize: 20),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.explore_outlined,
+                                size: 16,
+                                color: Color(0xFFB88E2D),
+                              ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  _query.isEmpty ? l10n.allReciters : l10n.results,
+                                  style: AppTheme.sans(
+                                    fontSize: 16,
+                                    weight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Text(
-                          '${filtered.length} Masters',
+                          '${filtered.length} Available',
                           style: AppTheme.sans(
                             fontSize: 11,
                             color: AppColors.muted,
@@ -250,7 +290,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     sliver: SliverList.separated(
                       itemCount: filtered.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -264,6 +304,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       },
                     ),
                   ),
+                if (_query.isEmpty && saved.isNotEmpty)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            switch (languageCode) {
+                              'ar' => 'السور المفضلة',
+                              'so' => 'Suuradaha Loogu Jecelyahay',
+                              _ => 'Favorite Surahs',
+                            },
+                            style: AppTheme.sans(
+                              fontSize: 16,
+                              weight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          for (final track in saved.take(8)) ...[
+                            _SavedSurahRow(
+                              track: track,
+                              languageCode: languageCode,
+                              onPlay: () => openPlayerAndPlay(
+                                context,
+                                ref,
+                                track,
+                                queue: saved,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  const SliverToBoxAdapter(child: SizedBox(height: 120)),
               ],
             ),
           );
@@ -276,120 +354,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ReciterDetailScreen(reciterId: id),
-      ),
-    );
-  }
-}
-
-class _DailyReflectionCard extends StatelessWidget {
-  const _DailyReflectionCard({
-    required this.languageCode,
-    required this.onExplore,
-  });
-
-  final String languageCode;
-  final VoidCallback onExplore;
-
-  @override
-  Widget build(BuildContext context) {
-    final label = switch (languageCode) {
-      'ar' => 'تأمل يومي',
-      'so' => 'Fikrad maalinle',
-      _ => 'Daily Reflection',
-    };
-    final cta = switch (languageCode) {
-      'ar' => 'استمع الآن',
-      'so' => 'Dhageyso',
-      _ => 'Listen now',
-    };
-
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.forest, AppColors.deep],
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.35)),
-        boxShadow: AppColors.featuredShadow,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.auto_awesome_rounded,
-                  size: 16, color: AppColors.gold),
-              const SizedBox(width: 6),
-              Text(
-                label.toUpperCase(),
-                style: AppTheme.sans(
-                  fontSize: 10,
-                  color: AppColors.gold,
-                  weight: FontWeight.w700,
-                ).copyWith(letterSpacing: 1.1),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ',
-            textAlign: TextAlign.center,
-            style: AppTheme.amiri(
-              fontSize: 20,
-              color: AppColors.cream,
-            ),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Surah Al-Mulk',
-                      style: AppTheme.displayFont(
-                        fontSize: 16,
-                        color: AppColors.cream,
-                      ),
-                    ),
-                    Text(
-                      'Safwat al-Qurra Collection',
-                      style: AppTheme.sans(
-                        fontSize: 11,
-                        color: AppColors.mutedOnDark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              FilledButton.icon(
-                onPressed: onExplore,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.gold,
-                  foregroundColor: AppColors.deep,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon: const Icon(Icons.play_arrow_rounded, size: 18),
-                label: Text(
-                  cta,
-                  style: AppTheme.sans(
-                    fontSize: 12,
-                    weight: FontWeight.w700,
-                    color: AppColors.deep,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
@@ -414,145 +378,199 @@ class _FeaturedCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 256,
+        width: 224,
         decoration: BoxDecoration(
-          color: AppColors.creamCard,
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          border: Border.all(color: AppColors.border),
-          boxShadow: AppColors.cardShadow,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: AppColors.featuredShadow,
         ),
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
+            const ColoredBox(color: AppColors.forest),
+            if (reciterPortraitAsset(reciter) != null)
+              Image.asset(
+                reciterPortraitAsset(reciter)!,
+                fit: BoxFit.cover,
+              )
+            else if ((reciter.photoUrl ?? '').isNotEmpty)
+              CachedNetworkImage(
+                imageUrl: reciter.photoUrl!,
+                fit: BoxFit.cover,
+                errorWidget: (_, _, _) =>
                     const ColoredBox(color: AppColors.forest),
-                    if (reciterPortraitAsset(reciter) != null)
-                      Image.asset(
-                        reciterPortraitAsset(reciter)!,
-                        fit: BoxFit.cover,
-                      )
-                    else if ((reciter.photoUrl ?? '').isNotEmpty)
-                      CachedNetworkImage(
-                        imageUrl: reciter.photoUrl!,
-                        fit: BoxFit.contain,
-                        errorWidget: (_, _, _) =>
-                            const ColoredBox(color: AppColors.forest),
-                      )
-                    else
-                      ColoredBox(
-                        color: AppColors.forestSoft,
-                        child: Center(
-                          child: ReciterInitialsAvatar(name: name, size: 64),
-                        ),
-                      ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Colors.transparent,
-                            Color(0xE0062423),
-                          ],
-                          stops: [0.35, 1],
-                        ),
-                      ),
+              ),
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x33000000), Color(0xD9000000)],
+                  stops: [0.35, 1],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 12,
+              right: 12,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.92),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.favorite_border_rounded,
+                  size: 16,
+                  color: Color(0xFF0D3B2E),
+                ),
+              ),
+            ),
+            if (region.isNotEmpty)
+              Positioned(
+                top: 14,
+                left: 14,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xE6DFB76C),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    region.toUpperCase(),
+                    style: AppTheme.sans(
+                      fontSize: 10,
+                      color: const Color(0xFF07241C),
+                      weight: FontWeight.w800,
                     ),
-                    if (region.isNotEmpty)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.deep.withValues(alpha: 0.72),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: AppColors.gold.withValues(alpha: 0.45),
-                            ),
-                          ),
-                          child: Text(
-                            region,
-                            style: AppTheme.sans(
-                              fontSize: 10,
-                              color: AppColors.goldLight,
-                              weight: FontWeight.w600,
-                            ),
-                          ),
+                  ),
+                ),
+              ),
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 16,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTheme.sans(
+                      fontSize: 16,
+                      color: Colors.white,
+                      weight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    switch (languageCode) {
+                      'ar' =>
+                        '${reciter.approvedRecitationsCount} سور · تلاوة',
+                      'so' =>
+                        '${reciter.approvedRecitationsCount} suuradood · Tilawa',
+                      _ => '${reciter.approvedRecitationsCount} surahs · Tilawa',
+                    },
+                    style: AppTheme.sans(
+                      fontSize: 12,
+                      color: AppColors.goldLight,
+                      weight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.28),
                         ),
                       ),
-                    Positioned(
-                      left: 10,
-                      right: 10,
-                      bottom: 10,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          if (reciter.nameArabic.isNotEmpty)
-                            Text(
-                              reciter.nameArabic,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textDirection: TextDirection.rtl,
-                              style: AppTheme.amiri(
-                                fontSize: 13,
-                                color: AppColors.goldLight,
-                              ),
-                            ),
+                          const Icon(
+                            Icons.play_arrow_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.displayFont(
-                              fontSize: 16,
-                              color: AppColors.cream,
-                              weight: FontWeight.w600,
+                            switch (languageCode) {
+                              'ar' => 'استمع الآن',
+                              'so' => 'Dhageyso hadda',
+                              _ => 'Listen now',
+                            },
+                            style: AppTheme.sans(
+                              fontSize: 12,
+                              color: Colors.white,
+                              weight: FontWeight.w700,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${reciter.approvedRecitationsCount} surahs',
-                    style: AppTheme.sans(
-                      fontSize: 11,
-                      color: AppColors.muted,
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: AppColors.creamSurface,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.play_arrow_rounded,
-                    size: 16,
-                    color: AppColors.forest,
-                  ),
-                ),
-              ],
-            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RegionChip extends StatelessWidget {
+  const _RegionChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Material(
+        color: selected ? const Color(0xFF0D3B2E) : Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: selected ? const Color(0xFF0D3B2E) : AppColors.border,
+              ),
+            ),
+            child: Text(
+              label,
+              style: AppTheme.sans(
+                fontSize: 12,
+                color: selected ? Colors.white : const Color(0xFF0D3B2E),
+                weight: FontWeight.w700,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -573,6 +591,7 @@ class _ReciterRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = reciter.localizedName(languageCode);
+    final bio = reciter.localizedBio(languageCode);
 
     return Material(
       color: AppColors.creamCard,
@@ -591,7 +610,8 @@ class _ReciterRow extends StatelessWidget {
             children: [
               ReciterFace(
                 reciter: reciter,
-                size: 56,
+                size: 58,
+                borderRadius: BorderRadius.circular(18),
                 nameForFallback: name,
               ),
               const SizedBox(width: 12),
@@ -601,19 +621,20 @@ class _ReciterRow extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: AppTheme.displayFont(
-                        fontSize: 16,
-                        weight: FontWeight.w600,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.sans(
+                        fontSize: 15,
+                        weight: FontWeight.w800,
                       ),
                     ),
-                    if (reciter.nameArabic.isNotEmpty)
+                    if (bio.isNotEmpty)
                       Text(
-                        reciter.nameArabic,
+                        bio,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        textDirection: TextDirection.rtl,
-                        style: AppTheme.amiri(
-                          fontSize: 13,
+                        style: AppTheme.sans(
+                          fontSize: 12,
                           color: AppColors.muted,
                         ),
                       ),
@@ -621,7 +642,92 @@ class _ReciterRow extends StatelessWidget {
                       '${reciter.approvedRecitationsCount} Surahs'
                       '${(reciter.region ?? '').isNotEmpty ? ' · ${reciter.region}' : ''}',
                       style: AppTheme.sans(
-                        fontSize: 11,
+                        fontSize: 12,
+                        color: const Color(0xFFB88E2D),
+                        weight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded,
+                  size: 22, color: Color(0xFFCBD5D1)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SavedSurahRow extends StatelessWidget {
+  const _SavedSurahRow({
+    required this.track,
+    required this.languageCode,
+    required this.onPlay,
+  });
+
+  final Recitation track;
+  final String languageCode;
+  final VoidCallback onPlay;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = track.surah?.localizedName(languageCode) ??
+        'Surah ${track.surahId}';
+    final arabic = track.surah?.nameArabic ?? '';
+    final number = track.surah?.number ?? track.surahId;
+
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onPlay,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF3F0E6),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '$number',
+                  style: AppTheme.sans(
+                    fontSize: 13,
+                    weight: FontWeight.w800,
+                    color: const Color(0xFF0D3B2E),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.sans(
+                        fontSize: 14,
+                        weight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      [
+                        if (arabic.isNotEmpty) arabic,
+                        track.durationLabel,
+                      ].join(' · '),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.sans(
+                        fontSize: 12,
                         color: AppColors.muted,
                       ),
                     ),
@@ -629,21 +735,18 @@ class _ReciterRow extends StatelessWidget {
                 ),
               ),
               Container(
-                width: 32,
-                height: 32,
+                width: 36,
+                height: 36,
                 decoration: const BoxDecoration(
-                  color: AppColors.creamSurface,
+                  color: Color(0xFF0D3B2E),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.play_arrow_rounded,
-                  size: 18,
-                  color: AppColors.forest,
+                  color: Color(0xFFE8C882),
+                  size: 20,
                 ),
               ),
-              const SizedBox(width: 4),
-              const Icon(Icons.arrow_forward_ios_rounded,
-                  size: 14, color: AppColors.muted),
             ],
           ),
         ),

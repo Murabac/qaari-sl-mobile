@@ -89,79 +89,175 @@ class HomeBrandHeader extends ConsumerWidget {
     required this.searchController,
     required this.onSearchChanged,
     required this.searchHint,
-    required this.greetingSmall,
-    required this.greetingTitle,
   });
 
   final TextEditingController searchController;
   final ValueChanged<String> onSearchChanged;
   final String searchHint;
-  final String greetingSmall;
-  final String greetingTitle;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final locale = ref.watch(localeControllerProvider);
-    return Container(
-      decoration: AppColors.creamHeaderDecoration,
-      padding: EdgeInsets.fromLTRB(
-        20,
-        MediaQuery.paddingOf(context).top + 12,
-        20,
-        16,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const QaariLogo(size: 42),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppConstants.appName,
-                      style: AppTheme.displayFont(
-                        fontSize: 18,
-                        weight: FontWeight.w700,
+    final code = ref.watch(localeControllerProvider).languageCode;
+    final subtitle = switch (code) {
+      'ar' => 'أصوات وتلاوات القراء الصوماليين',
+      'so' => 'Akhriska Quraanka Quraada Soomaaliyeed',
+      _ => 'Somali Quran Reciters Anthology',
+    };
+
+    return ColoredBox(
+      color: AppColors.deep,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          16,
+          MediaQuery.paddingOf(context).top + 10,
+          16,
+          14,
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const QaariLogo(size: 44, light: true),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              AppConstants.appName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.sans(
+                                fontSize: 18,
+                                color: Colors.white,
+                                weight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0x33D4AF37),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Text(
+                              'TILAWA',
+                              style: AppTheme.sans(
+                                fontSize: 9,
+                                color: const Color(0xFFF3D082),
+                                weight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      'Safwat al-Qurra',
-                      style: AppTheme.sans(
-                        fontSize: 10,
-                        color: AppColors.gold,
-                        weight: FontWeight.w600,
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.sans(
+                          fontSize: 11,
+                          color: const Color(0xFFA3B8B0),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _showDailyAyah(context),
+                  style: IconButton.styleFrom(
+                    backgroundColor: const Color(0xFF103D30),
+                    foregroundColor: AppColors.goldLight,
+                    side: const BorderSide(color: Color(0x1FFFFFFF)),
+                  ),
+                  icon: const Icon(Icons.notifications_none_rounded, size: 20),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: searchController,
+              onChanged: onSearchChanged,
+              style: AppTheme.sans(fontSize: 14, color: Colors.white),
+              decoration: InputDecoration(
+                hintText: searchHint,
+                hintStyle: AppTheme.sans(
+                  fontSize: 14,
+                  color: const Color(0xFF7A988D),
+                ),
+                filled: true,
+                fillColor: const Color(0xFF0F352A),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  color: Color(0xFF7A988D),
+                  size: 20,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0x1FFFFFFF)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: Color(0x1FFFFFFF)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.gold),
                 ),
               ),
-              LocaleSwitcherCompact(selected: locale.languageCode),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDailyAyah(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: const Color(0xFFFAF8F3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: AppTheme.amiri(fontSize: 26, color: AppColors.ink),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ',
+                textAlign: TextAlign.center,
+                textDirection: TextDirection.rtl,
+                style: AppTheme.amiri(fontSize: 22, color: AppColors.forest),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'OK',
+                  style: AppTheme.sans(
+                    color: AppColors.forest,
+                    weight: FontWeight.w800,
+                  ),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 14),
-          Text(
-            greetingSmall,
-            style: AppTheme.sans(
-              fontSize: 12,
-              color: AppColors.muted,
-              weight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            greetingTitle,
-            style: AppTheme.displayFont(fontSize: 24, weight: FontWeight.w600),
-          ),
-          const SizedBox(height: 14),
-          QaariSearchField(
-            controller: searchController,
-            hint: searchHint,
-            onChanged: onSearchChanged,
-          ),
-        ],
+        ),
       ),
     );
   }

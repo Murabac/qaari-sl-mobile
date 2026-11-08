@@ -49,10 +49,50 @@ class PlaylistDetailScreen extends ConsumerWidget {
 
           return ListView.separated(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-            itemCount: items.length,
+            itemCount: items.length + 1,
             separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
-              final item = items[index];
+              if (index == 0) {
+                final queue = items.map((item) => item.recitation!).toList();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PLAYLIST',
+                        style: AppTheme.sans(
+                          fontSize: 11,
+                          color: const Color(0xFFB88E2D),
+                          weight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        playlist.name,
+                        style: AppTheme.sans(fontSize: 22, weight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: () => openPlayerAndPlay(
+                          context,
+                          ref,
+                          queue.first,
+                          queue: queue,
+                        ),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF0D3B2E),
+                          foregroundColor: const Color(0xFFE8C882),
+                          shape: const StadiumBorder(),
+                        ),
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        label: const Text('Play All Tracks'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              final item = items[index - 1];
               final track = item.recitation!;
               final title = track.surah == null
                   ? 'Surah ${track.surahId}'

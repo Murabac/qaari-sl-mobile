@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
-/// Google AI portraits for the three live reciters.
-/// Sufi uses Abdirashid, Alafasy uses Abdilahi, al-Hussary uses Mustafe.
+/// Portraits for the live reciters.
+/// Sufi uses Abdirashid, Alafasy uses his own photo, al-Hussary uses Mustafe.
 String? reciterPortraitAsset(Reciter reciter) {
   final haystack =
       '${reciter.nameEnglish} ${reciter.nameSomali}'.toLowerCase();
@@ -15,9 +15,10 @@ String? reciterPortraitAsset(Reciter reciter) {
   }
   if (haystack.contains('alafasy') ||
       haystack.contains('mishary') ||
-      haystack.contains('cafaasi') ||
-      haystack.contains('abdilahi') ||
-      haystack.contains('cabdilaahi')) {
+      haystack.contains('cafaasi')) {
+    return 'assets/images/mishary_alafasy.jpg';
+  }
+  if (haystack.contains('abdilahi') || haystack.contains('cabdilaahi')) {
     return 'assets/images/sheikh_abdilahi.jpg';
   }
   if (haystack.contains('hussary') ||

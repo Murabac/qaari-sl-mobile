@@ -201,11 +201,46 @@ class _FollowAlongScreenState extends ConsumerState<FollowAlongScreen> {
                                     ]
                                   : null,
                             ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Expanded(
-                                  child: Text(
+                                Row(
+                                  children: [
+                                    if (active)
+                                      Text(
+                                        'Hadda socda',
+                                        style: AppTheme.sans(
+                                          fontSize: 11,
+                                          color: AppColors.goldLight,
+                                          weight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    const Spacer(),
+                                    Container(
+                                      width: 30,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: active
+                                            ? AppColors.gold.withValues(alpha: 0.25)
+                                            : AppColors.cream,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        '${ayah.number}',
+                                        style: TextStyle(
+                                          color: active
+                                              ? AppColors.gold
+                                              : AppColors.ink,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
                                     ayah.textUthmani,
                                     textAlign: TextAlign.right,
                                     textDirection: TextDirection.rtl,
@@ -217,29 +252,6 @@ class _FollowAlongScreenState extends ConsumerState<FollowAlongScreen> {
                                           : AppColors.ink,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Container(
-                                  width: 30,
-                                  height: 30,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: active
-                                        ? AppColors.gold.withValues(alpha: 0.25)
-                                        : AppColors.cream,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    '${ayah.number}',
-                                    style: TextStyle(
-                                      color: active
-                                          ? AppColors.gold
-                                          : AppColors.ink,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
@@ -294,14 +306,23 @@ class _FollowAlongScreenState extends ConsumerState<FollowAlongScreen> {
                         ),
                       ),
                     ),
-                    IconButton(
-                      onPressed: () =>
-                          ref.read(playerControllerProvider.notifier).toggle(),
-                      icon: Icon(
-                        player.isPlaying
-                            ? Icons.pause_rounded
-                            : Icons.play_arrow_rounded,
-                        color: AppColors.gold,
+                    Material(
+                      color: AppColors.gold,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () =>
+                            ref.read(playerControllerProvider.notifier).toggle(),
+                        child: SizedBox(
+                          width: 48,
+                          height: 48,
+                          child: Icon(
+                            player.isPlaying
+                                ? Icons.pause_rounded
+                                : Icons.play_arrow_rounded,
+                            color: AppColors.deep,
+                          ),
+                        ),
                       ),
                     ),
                   ],

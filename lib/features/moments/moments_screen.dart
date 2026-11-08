@@ -292,13 +292,48 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.navMoments,
-                  style: AppTheme.displayFont(
-                    fontSize: 28,
-                    color: AppColors.cream,
-                    weight: FontWeight.w600,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.navMoments,
+                        style: AppTheme.displayFont(
+                          fontSize: 28,
+                          color: AppColors.cream,
+                          weight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0x33D4AF37),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome_rounded,
+                            size: 14,
+                            color: Color(0xFFE5B54F),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Quran Shorts',
+                            style: AppTheme.sans(
+                              fontSize: 11,
+                              color: const Color(0xFFE8C882),
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -308,17 +343,27 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
                   onSubmitted: (_) => _load(reset: true),
                   decoration: InputDecoration(
                     hintText: l10n.momentsSearch,
-                    hintStyle: AppTheme.sans(color: AppColors.muted),
+                    hintStyle: AppTheme.sans(color: const Color(0xFF7A988D)),
                     filled: true,
-                    fillColor: AppColors.forest,
+                    fillColor: const Color(0xFF0F352A),
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 12,
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: Color(0xFF7A988D),
+                      size: 20,
                     ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0x33FFFFFF)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0x33FFFFFF)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: const BorderSide(color: Color(0xFFE5B54F)),
                     ),
                   ),
                 ),
@@ -335,19 +380,10 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
                       ])
                         Padding(
                           padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text(entry.$2),
+                          child: _FilterChip(
+                            label: entry.$2,
                             selected: _filter == entry.$1 && _tag == null,
-                            selectedColor: AppColors.gold,
-                            backgroundColor: AppColors.forest,
-                            labelStyle: AppTheme.sans(
-                              color: _filter == entry.$1 && _tag == null
-                                  ? AppColors.deep
-                                  : AppColors.cream,
-                              weight: FontWeight.w700,
-                              fontSize: 12,
-                            ),
-                            onSelected: (_) {
+                            onTap: () {
                               setState(() {
                                 _filter = entry.$1;
                                 _tag = null;
@@ -662,12 +698,17 @@ class _MomentCardState extends State<_MomentCard> {
   Widget build(BuildContext context) {
     final moment = widget.moment;
     final reciterName = moment.reciter?.localizedName(widget.languageCode) ?? '';
-    final headline = reciterName.isNotEmpty ? reciterName : (moment.title ?? '').trim();
+    final title = (moment.title ?? '').trim();
+    final headline = title.isNotEmpty ? title : reciterName;
     final surahLabel = moment.surah == null
         ? null
         : moment.ayahNumber == null
             ? moment.surah!.localizedName(widget.languageCode)
             : '${moment.surah!.localizedName(widget.languageCode)} · ${moment.ayahNumber}';
+    final subtitle = [
+      if (reciterName.isNotEmpty && reciterName != headline) reciterName,
+      ?surahLabel,
+    ].join(' · ');
     final aspect = momentFrameAspect(moment.width, moment.height);
 
     return DecoratedBox(
@@ -686,13 +727,27 @@ class _MomentCardState extends State<_MomentCard> {
                 onTap: widget.onOpenReciter,
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: Text(
-                    headline,
-                    style: AppTheme.sans(
-                      fontSize: 15,
-                      color: AppColors.cream,
-                      weight: FontWeight.w700,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        headline,
+                        style: AppTheme.sans(
+                          fontSize: 16,
+                          color: AppColors.cream,
+                          weight: FontWeight.w800,
+                        ),
+                      ),
+                      if (subtitle.isNotEmpty)
+                        Text(
+                          subtitle,
+                          style: AppTheme.sans(
+                            fontSize: 12,
+                            color: AppColors.goldLight,
+                            weight: FontWeight.w600,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -742,74 +797,84 @@ class _MomentCardState extends State<_MomentCard> {
                         const Center(
                           child: Icon(Icons.favorite, color: AppColors.gold, size: 72),
                         ),
+                      const Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Icon(
+                          Icons.music_note_rounded,
+                          color: Color(0xFFE8C882),
+                          size: 18,
+                        ),
+                      ),
+                      if (_ready && _controller?.value.isPlaying == true)
+                        Positioned(
+                          left: 10,
+                          bottom: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.45),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.pause_rounded,
+                                  color: Color(0xFFE8C882),
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Playing Tilawa',
+                                  style: AppTheme.sans(
+                                    fontSize: 11,
+                                    color: AppColors.cream,
+                                    weight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Row(
               children: [
                 _Action(
                   icon: moment.liked ? Icons.favorite : Icons.favorite_border,
-                  color: moment.liked ? AppColors.gold : AppColors.cream,
+                  color: moment.liked ? const Color(0xFFE5B54F) : AppColors.cream,
                   label: '${moment.likesCount}',
                   onTap: widget.onToggleLike,
                 ),
-                const SizedBox(width: 8),
                 _Action(
                   icon: moment.saved ? Icons.bookmark : Icons.bookmark_border,
-                  color: moment.saved ? AppColors.gold : AppColors.cream,
+                  color: moment.saved ? const Color(0xFFE5B54F) : AppColors.cream,
                   label: widget.saveLabel,
                   onTap: widget.onToggleSave,
                 ),
-                const SizedBox(width: 8),
                 _Action(
                   icon: Icons.chat_bubble_outline,
                   color: AppColors.cream,
                   label: '${moment.commentsCount}',
                   onTap: widget.onOpenComments,
                 ),
-                if (widget.onToggleFollow != null) ...[
-                  const SizedBox(width: 8),
-                  _Action(
-                    icon: moment.followedReciter
-                        ? Icons.person
-                        : Icons.person_add_alt_1,
-                    color: moment.followedReciter ? AppColors.gold : AppColors.cream,
-                    label: widget.followLabel ?? '',
-                    onTap: widget.onToggleFollow!,
-                  ),
-                ],
-                const SizedBox(width: 8),
+                const Spacer(),
                 _Action(
                   icon: widget.muted ? Icons.volume_off_rounded : Icons.volume_up_rounded,
-                  color: AppColors.cream,
+                  color: AppColors.goldLight,
                   label: widget.soundLabel,
                   onTap: widget.onToggleMute,
                 ),
-                if (widget.onOpenFollowAlong != null) ...[
-                  const SizedBox(width: 8),
-                  _Action(
-                    icon: Icons.menu_book_rounded,
-                    color: AppColors.gold,
-                    label: widget.ayahLabel,
-                    onTap: widget.onOpenFollowAlong!,
-                  ),
-                ],
               ],
             ),
-            if ((moment.title ?? '').isNotEmpty && headline != moment.title) ...[
-              const SizedBox(height: 8),
-              Text(
-                moment.title!,
-                style: AppTheme.sans(
-                  fontSize: 13,
-                  color: AppColors.goldLight,
-                  weight: FontWeight.w700,
-                ),
-              ),
-            ],
             if ((moment.caption ?? '').isNotEmpty) ...[
               const SizedBox(height: 6),
               GestureDetector(
@@ -847,29 +912,92 @@ class _MomentCardState extends State<_MomentCard> {
                 ],
               ),
             ],
-            if (surahLabel != null) ...[
-              const SizedBox(height: 10),
-              InkWell(
-                onTap: widget.onOpenFollowAlong ?? widget.onOpenReciter,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.deep.withValues(alpha: 0.55),
-                    borderRadius: BorderRadius.circular(AppRadius.chip),
-                    border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
-                  ),
-                  child: Text(
-                    surahLabel,
-                    style: AppTheme.sans(
-                      fontSize: 12,
-                      color: AppColors.cream,
-                      weight: FontWeight.w700,
-                    ),
-                  ),
+            if (widget.onOpenFollowAlong != null || widget.onToggleFollow != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  children: [
+                    if (widget.onOpenFollowAlong != null)
+                      TextButton.icon(
+                        onPressed: widget.onOpenFollowAlong,
+                        icon: const Icon(Icons.menu_book_rounded, size: 16, color: Color(0xFFE5B54F)),
+                        label: Text(
+                          widget.ayahLabel,
+                          style: AppTheme.sans(
+                            fontSize: 12,
+                            color: AppColors.goldLight,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    if (widget.onToggleFollow != null)
+                      TextButton(
+                        onPressed: widget.onToggleFollow,
+                        child: Text(
+                          widget.followLabel ?? '',
+                          style: AppTheme.sans(
+                            fontSize: 12,
+                            color: moment.followedReciter
+                                ? const Color(0xFFE5B54F)
+                                : AppColors.cream,
+                            weight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? const Color(0xFFE5B54F) : const Color(0xFF0A261E),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? const Color(0xFFE5B54F) : const Color(0x33FFFFFF),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (selected) ...[
+                const Icon(Icons.check_rounded, size: 14, color: Color(0xFF07241C)),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                label,
+                style: AppTheme.sans(
+                  fontSize: 12,
+                  weight: FontWeight.w800,
+                  color: selected ? const Color(0xFF07241C) : AppColors.cream,
                 ),
               ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -1027,7 +1155,11 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
                   children: [
                     Expanded(
                       child: Text(
-                        l10n.momentsComment,
+                        switch (Localizations.localeOf(context).languageCode) {
+                          'ar' => 'التعليقات (${_comments.length})',
+                          'so' => 'Faallooyin (${_comments.length})',
+                          _ => 'Comments (${_comments.length})',
+                        },
                         style: AppTheme.displayFont(fontSize: 22),
                       ),
                     ),
@@ -1084,7 +1216,11 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
                         controller: _body,
                         maxLength: 500,
                         decoration: InputDecoration(
-                          hintText: l10n.momentsCommentHint,
+                          hintText: switch (Localizations.localeOf(context).languageCode) {
+                            'so' => 'Qor duco ama faallo kooban...',
+                            'ar' => 'اكتب دعاء أو تعليقاً قصيراً...',
+                            _ => l10n.momentsCommentHint,
+                          },
                           counterText: '',
                         ),
                         onSubmitted: (_) => _send(),

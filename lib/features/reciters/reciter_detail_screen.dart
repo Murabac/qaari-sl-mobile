@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
@@ -45,120 +46,215 @@ class ReciterDetailScreen extends ConsumerWidget {
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 240,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      const ColoredBox(color: AppColors.forest),
-                      const DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0x73062423),
-                              Color(0xC7062423),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: MediaQuery.paddingOf(context).top + 8,
-                        left: 16,
-                        child: QaariForestIconButton(
-                          icon: Icons.arrow_back_rounded,
-                          onTap: () => Navigator.of(context).pop(),
-                        ),
-                      ),
-                      Positioned(
-                        left: 20,
-                        right: 20,
-                        bottom: 18,
-                        child: Row(
-                          children: [
-                            ReciterFace(
-                              reciter: reciter,
-                              size: 58,
-                              nameForFallback: name,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 300,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          const ColoredBox(color: AppColors.forest),
+                          if (reciterPortraitAsset(reciter) != null)
+                            Image.asset(
+                              reciterPortraitAsset(reciter)!,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
+                            )
+                          else if ((reciter.photoUrl ?? '').isNotEmpty)
+                            CachedNetworkImage(
+                              imageUrl: reciter.photoUrl!,
+                              fit: BoxFit.cover,
+                              alignment: Alignment.topCenter,
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name,
-                                    style: const TextStyle(
-                                      color: AppColors.cream,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  if ((reciter.region ?? '').isNotEmpty)
-                                    Text(
-                                      reciter.region!,
-                                      style: const TextStyle(
-                                        color: AppColors.gold,
-                                        fontSize: 13,
-                                      ),
-                                    ),
+                          const DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0x00F5F2EA),
+                                  Color(0x00F5F2EA),
+                                  Color(0xB3F5F2EA),
+                                  AppColors.cream,
+                                  AppColors.cream,
                                 ],
+                                stops: [0, 0.42, 0.62, 0.78, 1],
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            _FollowReciterButton(reciter: reciter),
-                          ],
-                        ),
+                          ),
+                          Positioned(
+                            top: MediaQuery.paddingOf(context).top + 8,
+                            left: 12,
+                            child: _RoundIconButton(
+                              icon: Icons.chevron_left_rounded,
+                              onTap: () => Navigator.of(context).pop(),
+                            ),
+                          ),
+                          Positioned(
+                            top: MediaQuery.paddingOf(context).top + 8,
+                            right: 12,
+                            child: Row(
+                              children: [
+                                if (reciter.recitations.isNotEmpty)
+                                  _RoundIconButton(
+                                    icon: Icons.ios_share_rounded,
+                                    onTap: () => shareRecitation(
+                                      reciter.recitations.first,
+                                    ),
+                                  ),
+                                const SizedBox(width: 8),
+                                _FollowReciterButton(
+                                  reciter: reciter,
+                                  heart: true,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            left: 20,
+                            right: 20,
+                            bottom: 4,
+                            child: Row(
+                              children: [
+                                DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.cream,
+                                      width: 3,
+                                    ),
+                                  ),
+                                  child: ReciterFace(
+                                    reciter: reciter,
+                                    size: 64,
+                                    nameForFallback: name,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        name,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTheme.sans(
+                                          fontSize: 22,
+                                          color: const Color(0xFF10241C),
+                                          weight: FontWeight.w800,
+                                          height: 1.15,
+                                        ),
+                                      ),
+                                      if ((reciter.region ?? '').isNotEmpty)
+                                        Text(
+                                          reciter.region!,
+                                          style: AppTheme.sans(
+                                            fontSize: 13,
+                                            color: const Color(0xFFB88E2D),
+                                            weight: FontWeight.w700,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: Container(
-                  color: AppColors.creamCard,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child: Row(
-                    children: [
-                      _StatCell(
-                        value: '${reciter.approvedRecitationsCount}',
-                        label: 'Surahs',
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18),
+                                boxShadow: AppColors.cardShadow,
+                              ),
+                              child: Row(
+                                children: [
+                                  _StatCell(
+                                    value: '${reciter.approvedRecitationsCount}',
+                                    label: switch (languageCode) {
+                                      'ar' => 'سور',
+                                      'so' => 'SUURADOOD',
+                                      _ => 'SURAHS',
+                                    },
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 36,
+                                    color: AppColors.border,
+                                  ),
+                                  _StatCell(
+                                    value: (reciter.region ?? '—')
+                                        .split(' ')
+                                        .first,
+                                    label: switch (languageCode) {
+                                      'ar' => 'المنطقة',
+                                      'so' => 'GOBOLKA',
+                                      _ => 'REGION',
+                                    },
+                                  ),
+                                  Container(
+                                    width: 1,
+                                    height: 36,
+                                    color: AppColors.border,
+                                  ),
+                                  _StatCell(
+                                    value: 'Tilawa',
+                                    label: switch (languageCode) {
+                                      'ar' => 'الأسلوب',
+                                      'so' => 'QAABKA',
+                                      _ => 'STYLE',
+                                    },
+                                  ),
+                                ],
+                              ),
                       ),
-                      Container(width: 1, height: 36, color: AppColors.border),
-                      _StatCell(
-                        value: (reciter.region ?? '—').split(' ').first,
-                        label: 'Region',
-                      ),
-                      Container(width: 1, height: 36, color: AppColors.border),
-                      const _StatCell(value: 'Tilawa', label: 'Style'),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               if (bio.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'ABOUT',
-                          style: TextStyle(
+                        Text(
+                          switch (languageCode) {
+                            'ar' => 'نبذة',
+                            'so' => 'KU SAABSAN',
+                            _ => 'ABOUT',
+                          },
+                          style: const TextStyle(
                             color: AppColors.muted,
-                            fontSize: 10,
+                            fontSize: 11,
                             fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
+                            letterSpacing: 1.1,
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          bio,
-                          style: const TextStyle(
-                            color: AppColors.muted,
-                            fontSize: 13,
-                            height: 1.55,
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: AppColors.border),
+                          ),
+                          child: Text(
+                            bio,
+                            style: const TextStyle(
+                              color: Color(0xFF1C3A32),
+                              fontSize: 14,
+                              height: 1.55,
+                            ),
                           ),
                         ),
                       ],
@@ -168,12 +264,29 @@ class ReciterDetailScreen extends ConsumerWidget {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 10),
-                  child: Text(
-                    'Surahs',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
+                  child: Row(
+                    children: [
+                      Text(
+                        switch (languageCode) {
+                          'ar' => 'السور',
+                          'so' => 'Suuradood',
+                          _ => 'Surahs',
+                        },
+                        style: AppTheme.sans(
+                          fontSize: 18,
+                          weight: FontWeight.w800,
                         ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${reciter.approvedRecitationsCount} Recitations',
+                        style: AppTheme.sans(
+                          fontSize: 12,
+                          color: const Color(0xFFB88E2D),
+                          weight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -385,8 +498,8 @@ class _SurahRow extends ConsumerWidget {
                     openPlayerAndPlay(context, ref, track, queue: queue);
                   },
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.forest,
-                    foregroundColor: AppColors.gold,
+                    backgroundColor: const Color(0xFF0D3B2E),
+                    foregroundColor: const Color(0xFFE8C882),
                   ),
                   icon: Icon(
                     isCurrent && player.isPlaying
@@ -404,10 +517,35 @@ class _SurahRow extends ConsumerWidget {
   }
 }
 
+class _RoundIconButton extends StatelessWidget {
+  const _RoundIconButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xCC0D3B2E),
+      shape: const CircleBorder(),
+      child: InkWell(
+        customBorder: const CircleBorder(),
+        onTap: onTap,
+        child: SizedBox(
+          width: 40,
+          height: 40,
+          child: Icon(icon, color: Colors.white, size: 22),
+        ),
+      ),
+    );
+  }
+}
+
 class _FollowReciterButton extends ConsumerStatefulWidget {
-  const _FollowReciterButton({required this.reciter});
+  const _FollowReciterButton({required this.reciter, this.heart = false});
 
   final Reciter reciter;
+  final bool heart;
 
   @override
   ConsumerState<_FollowReciterButton> createState() =>
@@ -463,6 +601,25 @@ class _FollowReciterButtonState extends ConsumerState<_FollowReciterButton> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    if (widget.heart) {
+      return Material(
+        color: _followed ? const Color(0xFFE5B54F) : const Color(0xCC0D3B2E),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: _toggle,
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(
+              _followed ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+              color: _followed ? const Color(0xFF08281F) : Colors.white,
+              size: 20,
+            ),
+          ),
+        ),
+      );
+    }
     return TextButton(
       onPressed: _toggle,
       style: TextButton.styleFrom(

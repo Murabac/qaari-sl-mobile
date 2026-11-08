@@ -148,7 +148,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1800));
     await tester.pumpAndSettle();
 
-    expect(find.text('Kusoo Dhawoow Xulka Quraada'), findsOneWidget);
+    expect(find.text('Qaariyada la soo bandhigay'), findsOneWidget);
     expect(find.text('Demo'), findsWidgets);
     expect(find.text('Home'), findsOneWidget);
   });

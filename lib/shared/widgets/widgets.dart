@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
-import 'package:qaari_sl_mobile/shared/widgets/design_primitives.dart';
 import 'package:qaari_sl_mobile/shared/widgets/qaari_logo.dart';
 
 export 'design_primitives.dart';
@@ -168,21 +167,53 @@ class ForestPageHeader extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.trailing,
-    this.eyebrow,
   });
 
   final String title;
   final String? subtitle;
   final Widget? trailing;
-  final String? eyebrow;
 
   @override
   Widget build(BuildContext context) {
-    return CreamPageHeader(
-      eyebrow: eyebrow,
-      title: title,
-      subtitle: subtitle,
-      trailing: trailing,
+    final top = MediaQuery.paddingOf(context).top;
+    return ColoredBox(
+      color: AppColors.deep,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(20, top + 16, 20, 18),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w800,
+                      height: 1.1,
+                    ),
+                  ),
+                  if (subtitle != null && subtitle!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle!,
+                      style: const TextStyle(
+                        color: Color(0xFFE5B54F),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            ?trailing,
+          ],
+        ),
+      ),
     );
   }
 }

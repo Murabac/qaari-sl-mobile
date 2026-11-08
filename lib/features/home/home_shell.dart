@@ -43,11 +43,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final items = [
-      (Icons.home_rounded, l10n.navHome),
-      (Icons.auto_awesome_rounded, l10n.navMoments),
-      (Icons.favorite_rounded, l10n.navFavorites),
-      (Icons.queue_music_rounded, l10n.navPlaylists),
-      (Icons.settings_rounded, l10n.navSettings),
+      (Icons.home_outlined, l10n.navHome),
+      (Icons.auto_awesome_outlined, l10n.navMoments),
+      (Icons.favorite_border_rounded, l10n.navFavorites),
+      (Icons.queue_music_outlined, l10n.navPlaylists),
+      (Icons.settings_outlined, l10n.navSettings),
     ];
 
     return Scaffold(
@@ -164,12 +164,12 @@ class _QaariBottomNav extends StatelessWidget {
                           ),
                           if (i == index && i != 1)
                             Container(
-                              margin: const EdgeInsets.only(top: 2),
-                              width: 4,
-                              height: 4,
+                              margin: const EdgeInsets.only(top: 3),
+                              width: 18,
+                              height: 2,
                               decoration: BoxDecoration(
-                                color: dark ? AppColors.goldLight : AppColors.gold,
-                                shape: BoxShape.circle,
+                                color: dark ? AppColors.goldLight : const Color(0xFFB88E2D),
+                                borderRadius: BorderRadius.circular(2),
                               ),
                             ),
                         ],
