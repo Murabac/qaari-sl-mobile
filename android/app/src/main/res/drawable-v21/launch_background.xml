@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Native splash — brand green + new Safwat al-Qurra mark (no old SVG flash). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@color/ic_launcher_background" />
+    <item android:drawable="@color/launch_screen_background" />
     <item>
         <bitmap
             android:gravity="center"

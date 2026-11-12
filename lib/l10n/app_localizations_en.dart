@@ -174,4 +174,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forSomaliCommunity => 'For the Somali community';
+
+  @override
+  String get onboardingWelcomeTitle => 'Welcome to Xulka Quraada';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'Listen to Somali reciters, follow the ayah, and save what you love.';
+
+  @override
+  String get onboardingRecitersTitle => 'Chosen reciters';
+
+  @override
+  String get onboardingRecitersBody =>
+      'Pick a reciter, a region, or a surah, then start the recitation.';
+
+  @override
+  String get onboardingFollowTitle => 'Follow the ayah';
+
+  @override
+  String get onboardingFollowBody =>
+      'While the recitation plays, the Arabic ayah is highlighted.';
+
+  @override
+  String get onboardingMomentsTitle => 'Moments';
+
+  @override
+  String get onboardingMomentsBody =>
+      'Watch short clips, then like, save, or leave a short comment.';
+
+  @override
+  String get onboardingNotificationsTitle => 'Notifications';
+
+  @override
+  String get onboardingNotificationsBody =>
+      'Allow notifications so the playback controls can appear on the lock screen.';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingSkip => 'Skip';
+
+  @override
+  String get onboardingAllow => 'Allow';
+
+  @override
+  String get onboardingNotNow => 'Not now';
 }

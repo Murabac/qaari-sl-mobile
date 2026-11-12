@@ -3,6 +3,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/models/recitation.dart';
 
+/// A finished track stays at the end until playback is rewound.
+bool playbackNeedsRestart(ProcessingState state) =>
+    state == ProcessingState.completed;
+
 Future<QaariAudioHandler> initAudioService() {
   return AudioService.init(
     builder: QaariAudioHandler.new,
@@ -80,7 +84,12 @@ class QaariAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   @override
-  Future<void> play() => _player.play();
+  Future<void> play() async {
+    if (playbackNeedsRestart(_player.processingState)) {
+      await _player.seek(Duration.zero);
+    }
+    await _player.play();
+  }
 
   @override
   Future<void> pause() => _player.pause();

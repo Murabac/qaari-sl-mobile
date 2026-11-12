@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/// Feature switches. Moments stays in the codebase and returns when this is true.
+abstract final class AppFeatures {
+  static const moments = false;
+}
+
 /// App-wide constants for Xulka Quraada mobile.
 class AppConstants {
   static const String appName = 'Xulka Quraada';

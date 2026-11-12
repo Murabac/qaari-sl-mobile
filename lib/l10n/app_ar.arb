@@ -54,5 +54,19 @@
   "deleteAccount": "حذف الحساب",
   "privacyPolicy": "سياسة الخصوصية",
   "rateTheApp": "قيّم التطبيق",
-  "forSomaliCommunity": "للمجتمع الصومالي"
+  "forSomaliCommunity": "للمجتمع الصومالي",
+  "onboardingWelcomeTitle": "مرحباً بك في Xulka Quraada",
+  "onboardingWelcomeBody": "استمع إلى القراء الصوماليين، وتابع الآية، واحفظ ما تحب.",
+  "onboardingRecitersTitle": "قراء مختارون",
+  "onboardingRecitersBody": "اختر قارئاً أو منطقة أو سورة، ثم ابدأ التلاوة.",
+  "onboardingFollowTitle": "تابع الآية",
+  "onboardingFollowBody": "أثناء تشغيل التلاوة، تُبرز الآية العربية.",
+  "onboardingMomentsTitle": "لحظات",
+  "onboardingMomentsBody": "شاهد مقاطع قصيرة، ثم أُعجب بها أو احفظها أو اترك تعليقاً قصيراً.",
+  "onboardingNotificationsTitle": "الإشعارات",
+  "onboardingNotificationsBody": "اسمح بالإشعارات حتى تظهر عناصر التحكم بالتشغيل على شاشة القفل.",
+  "onboardingNext": "التالي",
+  "onboardingSkip": "تخطي",
+  "onboardingAllow": "سماح",
+  "onboardingNotNow": "ليس الآن"
 }

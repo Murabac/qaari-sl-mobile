@@ -12,6 +12,7 @@ import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
 import 'package:qaari_sl_mobile/features/player/open_player.dart';
+import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class FavoritesScreen extends ConsumerWidget {
@@ -32,9 +33,8 @@ class FavoritesScreen extends ConsumerWidget {
               : 'Sign in to sync favorites',
           trailing: auth.isAuthenticated
               ? TextButton.icon(
-                  onPressed: () => ref
-                      .read(favoritesControllerProvider.notifier)
-                      .refresh(),
+                  onPressed: () =>
+                      ref.read(favoritesControllerProvider.notifier).refresh(),
                   icon: const Icon(Icons.cloud_outlined, size: 16),
                   label: const Text('Sync'),
                   style: TextButton.styleFrom(
@@ -57,8 +57,7 @@ class FavoritesScreen extends ConsumerWidget {
                     ),
                   )
                 : AsyncBody(
-                    isLoading:
-                        favorites.isLoading && favorites.tracks.isEmpty,
+                    isLoading: favorites.isLoading && favorites.tracks.isEmpty,
                     error: favorites.error,
                     isEmpty: false,
                     emptyWidget: const _EmptyState(
@@ -103,36 +102,65 @@ class _FavoriteListsState extends ConsumerState<_FavoriteLists> {
   @override
   Widget build(BuildContext context) {
     final languageCode = widget.languageCode;
-    final followed = ref.watch(recitersProvider('')).maybeWhen(
-          data: (reciters) => reciters.where((reciter) => reciter.followed).toList(),
+    final followed = ref
+        .watch(recitersProvider(''))
+        .maybeWhen(
+          data: (reciters) =>
+              reciters.where((reciter) => reciter.followed).toList(),
           orElse: () => const <Reciter>[],
         );
     final showReciters = _filter != 'surahs';
     final showSurahs = _filter != 'reciters';
+    final recitersVisible = showReciters && followed.isNotEmpty;
+    final surahsVisible = showSurahs && widget.tracks.isNotEmpty;
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
+    final chips = Row(
       children: [
-        Row(
-          children: [
-            _Chip(
-              label: 'All (${widget.tracks.length + followed.length})',
-              selected: _filter == 'all',
-              onTap: () => setState(() => _filter = 'all'),
-            ),
-            _Chip(
-              label: 'Reciters (${followed.length})',
-              selected: _filter == 'reciters',
-              onTap: () => setState(() => _filter = 'reciters'),
-            ),
-            _Chip(
-              label: 'Surahs (${widget.tracks.length})',
-              selected: _filter == 'surahs',
-              onTap: () => setState(() => _filter = 'surahs'),
-            ),
-          ],
+        _Chip(
+          label: 'All (${widget.tracks.length + followed.length})',
+          selected: _filter == 'all',
+          onTap: () => setState(() => _filter = 'all'),
         ),
-        if (showReciters && followed.isNotEmpty) ...[
+        _Chip(
+          label: 'Reciters (${followed.length})',
+          selected: _filter == 'reciters',
+          onTap: () => setState(() => _filter = 'reciters'),
+        ),
+        _Chip(
+          label: 'Surahs (${widget.tracks.length})',
+          selected: _filter == 'surahs',
+          onTap: () => setState(() => _filter = 'surahs'),
+        ),
+      ],
+    );
+
+    if (!recitersVisible && !surahsVisible) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
+            child: chips,
+          ),
+          const Expanded(
+            child: _EmptyState(
+              icon: Icons.favorite_border_rounded,
+              message:
+                  'No favorites yet.\nTap the heart icon on any track to save it here.',
+            ),
+          ),
+        ],
+      );
+    }
+
+    final bottom = ShellMetrics.overlayHeight(
+      safeBottom: MediaQuery.paddingOf(context).bottom,
+      player: ref.watch(playerControllerProvider).current != null,
+    );
+    return ListView(
+      padding: EdgeInsets.fromLTRB(20, 14, 20, bottom),
+      children: [
+        chips,
+        if (recitersVisible) ...[
           const SizedBox(height: 16),
           Text(
             'FAVORITE RECITERS',
@@ -148,7 +176,7 @@ class _FavoriteListsState extends ConsumerState<_FavoriteLists> {
             const SizedBox(height: 10),
           ],
         ],
-        if (showSurahs) ...[
+        if (surahsVisible) ...[
           const SizedBox(height: 8),
           Text(
             'SAVED SURAHS & RECITATIONS',
@@ -160,104 +188,102 @@ class _FavoriteListsState extends ConsumerState<_FavoriteLists> {
           ),
           const SizedBox(height: 8),
           for (final track in widget.tracks) ...[
-            Builder(builder: (context) {
-                          final nameEn = track.surah?.localizedName(languageCode) ??
-                              'Surah ${track.surahId}';
-                          final nameAr = track.surah?.nameArabic ?? '';
-                          final number =
-                              track.surah?.number ?? track.surahId;
+            Builder(
+              builder: (context) {
+                final nameEn =
+                    track.surah?.localizedName(languageCode) ??
+                    'Surah ${track.surahId}';
+                final nameAr = track.surah?.nameArabic ?? '';
+                final number = track.surah?.number ?? track.surahId;
 
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.creamCard,
-                              borderRadius: BorderRadius.circular(AppRadius.card),
-                              boxShadow: AppColors.cardShadow,
+                return Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.creamCard,
+                    borderRadius: BorderRadius.circular(AppRadius.card),
+                    boxShadow: AppColors.cardShadow,
+                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: AppColors.forest,
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          '$number',
+                          style: const TextStyle(
+                            color: AppColors.gold,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              nameEn,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 14,
+                              ),
                             ),
-                            padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-                            child: Row(
+                            Row(
                               children: [
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.forest,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: Text(
-                                    '$number',
-                                    style: const TextStyle(
-                                      color: AppColors.gold,
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13,
+                                if (nameAr.isNotEmpty)
+                                  Text(
+                                    nameAr,
+                                    style: AppTheme.amiri(
+                                      fontSize: 15,
+                                      color: AppColors.muted,
+                                      height: 1.2,
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        nameEn,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          if (nameAr.isNotEmpty)
-                                            Text(
-                                              nameAr,
-                                              style: AppTheme.amiri(
-                                                fontSize: 15,
-                                                color: AppColors.muted,
-                                                height: 1.2,
-                                              ),
-                                            ),
-                                          Text(
-                                            ' · ${track.durationLabel}',
-                                            style: const TextStyle(
-                                              color: AppColors.muted,
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () => ref
-                                      .read(favoritesControllerProvider.notifier)
-                                      .toggle(track.id),
-                                  icon: const Icon(
-                                    Icons.favorite_rounded,
-                                    color: AppColors.gold,
-                                  ),
-                                ),
-                                IconButton(
-                                  style: IconButton.styleFrom(
-                                    backgroundColor: AppColors.forest,
-                                    foregroundColor: AppColors.gold,
-                                  ),
-                                  onPressed: () => openPlayerAndPlay(
-                                        context,
-                                        ref,
-                                        track,
-                                        queue: widget.tracks,
-                                      ),
-                                  icon: const Icon(
-                                    Icons.play_arrow_rounded,
-                                    size: 18,
+                                Text(
+                                  ' · ${track.durationLabel}',
+                                  style: const TextStyle(
+                                    color: AppColors.muted,
+                                    fontSize: 11,
                                   ),
                                 ),
                               ],
                             ),
-                          );
-            }),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => ref
+                            .read(favoritesControllerProvider.notifier)
+                            .toggle(track.id),
+                        icon: const Icon(
+                          Icons.favorite_rounded,
+                          color: AppColors.gold,
+                        ),
+                      ),
+                      IconButton(
+                        style: IconButton.styleFrom(
+                          backgroundColor: AppColors.forest,
+                          foregroundColor: AppColors.gold,
+                        ),
+                        onPressed: () => openPlayerAndPlay(
+                          context,
+                          ref,
+                          track,
+                          queue: widget.tracks,
+                        ),
+                        icon: const Icon(Icons.play_arrow_rounded, size: 18),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
             const SizedBox(height: 10),
           ],
         ],
@@ -352,7 +378,10 @@ class _ReciterFavorite extends StatelessWidget {
                       name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTheme.sans(fontSize: 14, weight: FontWeight.w800),
+                      style: AppTheme.sans(
+                        fontSize: 14,
+                        weight: FontWeight.w800,
+                      ),
                     ),
                     Text(
                       '${reciter.region ?? ''} · ${reciter.approvedRecitationsCount} surahs',
@@ -365,7 +394,10 @@ class _ReciterFavorite extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.play_circle_fill_rounded, color: Color(0xFF0D3B2E)),
+              const Icon(
+                Icons.play_circle_fill_rounded,
+                color: Color(0xFF0D3B2E),
+              ),
             ],
           ),
         ),
@@ -413,7 +445,10 @@ class _EmptyState extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFC6A15B),
                   foregroundColor: AppColors.deep,
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 28,
+                    vertical: 12,
+                  ),
                   shape: const StadiumBorder(),
                 ),
                 child: Text(actionLabel!),

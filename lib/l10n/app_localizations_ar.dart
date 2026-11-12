@@ -172,4 +172,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get forSomaliCommunity => 'للمجتمع الصومالي';
+
+  @override
+  String get onboardingWelcomeTitle => 'مرحباً بك في Xulka Quraada';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'استمع إلى القراء الصوماليين، وتابع الآية، واحفظ ما تحب.';
+
+  @override
+  String get onboardingRecitersTitle => 'قراء مختارون';
+
+  @override
+  String get onboardingRecitersBody =>
+      'اختر قارئاً أو منطقة أو سورة، ثم ابدأ التلاوة.';
+
+  @override
+  String get onboardingFollowTitle => 'تابع الآية';
+
+  @override
+  String get onboardingFollowBody =>
+      'أثناء تشغيل التلاوة، تُبرز الآية العربية.';
+
+  @override
+  String get onboardingMomentsTitle => 'لحظات';
+
+  @override
+  String get onboardingMomentsBody =>
+      'شاهد مقاطع قصيرة، ثم أُعجب بها أو احفظها أو اترك تعليقاً قصيراً.';
+
+  @override
+  String get onboardingNotificationsTitle => 'الإشعارات';
+
+  @override
+  String get onboardingNotificationsBody =>
+      'اسمح بالإشعارات حتى تظهر عناصر التحكم بالتشغيل على شاشة القفل.';
+
+  @override
+  String get onboardingNext => 'التالي';
+
+  @override
+  String get onboardingSkip => 'تخطي';
+
+  @override
+  String get onboardingAllow => 'سماح';
+
+  @override
+  String get onboardingNotNow => 'ليس الآن';
 }

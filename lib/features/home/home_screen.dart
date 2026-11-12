@@ -10,6 +10,7 @@ import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/core/data/library_repository.dart';
 import 'package:qaari_sl_mobile/features/player/open_player.dart';
+import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/reciters/reciter_detail_screen.dart';
 import 'package:qaari_sl_mobile/l10n/app_localizations.dart';
 import 'package:qaari_sl_mobile/shared/widgets/reciter_portrait.dart';
@@ -37,8 +38,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   List<Reciter> _featured(List<Reciter> all) {
-    final withPhoto =
-        all.where((r) => (r.photoUrl ?? '').isNotEmpty).take(5).toList();
+    final withPhoto = all
+        .where((r) => (r.photoUrl ?? '').isNotEmpty)
+        .take(5)
+        .toList();
     if (withPhoto.isNotEmpty) return withPhoto;
     return all.take(5).toList();
   }
@@ -50,10 +53,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         return false;
       }
       if (query.isEmpty) return true;
-      final haystack = '${reciter.nameSomali} ${reciter.nameArabic} '
-              '${reciter.nameEnglish} ${reciter.bioSomali} ${reciter.bioEnglish} '
-              '${reciter.region ?? ''}'
-          .toLowerCase();
+      final haystack =
+          '${reciter.nameSomali} ${reciter.nameArabic} '
+                  '${reciter.nameEnglish} ${reciter.bioSomali} ${reciter.bioEnglish} '
+                  '${reciter.region ?? ''}'
+              .toLowerCase();
       return haystack.contains(query);
     }).toList();
   }
@@ -231,6 +235,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             reciter: reciter,
                             languageCode: languageCode,
                             onTap: () => _open(reciter.id),
+                            onListen: () => _listen(reciter),
                           );
                         },
                       ),
@@ -254,7 +259,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               const SizedBox(width: 6),
                               Flexible(
                                 child: Text(
-                                  _query.isEmpty ? l10n.allReciters : l10n.results,
+                                  _query.isEmpty
+                                      ? l10n.allReciters
+                                      : l10n.results,
                                   style: AppTheme.sans(
                                     fontSize: 16,
                                     weight: FontWeight.w800,
@@ -307,7 +314,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (_query.isEmpty && saved.isNotEmpty)
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -339,9 +346,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                     ),
-                  )
-                else
-                  const SliverToBoxAdapter(child: SizedBox(height: 120)),
+                  ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: ShellMetrics.overlayHeight(
+                      safeBottom: MediaQuery.paddingOf(context).bottom,
+                      player:
+                          ref.watch(playerControllerProvider).current != null,
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -352,8 +366,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   void _open(int id) {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ReciterDetailScreen(reciterId: id),
+      MaterialPageRoute(builder: (_) => ReciterDetailScreen(reciterId: id)),
+    );
+  }
+
+  Future<void> _listen(Reciter reciter) async {
+    try {
+      final tracks = await resolveListenQueue(
+        reciter,
+        ref.read(catalogRepositoryProvider),
+      );
+      if (!mounted) return;
+      if (tracks.isEmpty) {
+        _showListenError();
+        return;
+      }
+      openPlayerAndPlay(context, ref, tracks.first, queue: tracks);
+    } catch (_) {
+      if (!mounted) return;
+      _showListenError();
+    }
+  }
+
+  void _showListenError() {
+    final code = Localizations.localeOf(context).languageCode;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(switch (code) {
+          'ar' => 'تعذر تشغيل التلاوة.',
+          'so' => 'Tilawada lama bilaabi karo.',
+          _ => 'Could not start this recitation.',
+        }),
       ),
     );
   }
@@ -364,11 +407,13 @@ class _FeaturedCard extends StatelessWidget {
     required this.reciter,
     required this.languageCode,
     required this.onTap,
+    required this.onListen,
   });
 
   final Reciter reciter;
   final String languageCode;
   final VoidCallback onTap;
+  final VoidCallback onListen;
 
   @override
   Widget build(BuildContext context) {
@@ -389,10 +434,7 @@ class _FeaturedCard extends StatelessWidget {
           children: [
             const ColoredBox(color: AppColors.forest),
             if (reciterPortraitAsset(reciter) != null)
-              Image.asset(
-                reciterPortraitAsset(reciter)!,
-                fit: BoxFit.cover,
-              )
+              Image.asset(reciterPortraitAsset(reciter)!, fit: BoxFit.cover)
             else if ((reciter.photoUrl ?? '').isNotEmpty)
               CachedNetworkImage(
                 imageUrl: reciter.photoUrl!,
@@ -470,11 +512,11 @@ class _FeaturedCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     switch (languageCode) {
-                      'ar' =>
-                        '${reciter.approvedRecitationsCount} سور · تلاوة',
+                      'ar' => '${reciter.approvedRecitationsCount} سور · تلاوة',
                       'so' =>
                         '${reciter.approvedRecitationsCount} suuradood · Tilawa',
-                      _ => '${reciter.approvedRecitationsCount} surahs · Tilawa',
+                      _ =>
+                        '${reciter.approvedRecitationsCount} surahs · Tilawa',
                     },
                     style: AppTheme.sans(
                       fontSize: 12,
@@ -483,43 +525,47 @@ class _FeaturedCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
-                        borderRadius: BorderRadius.circular(999),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.28),
+                  GestureDetector(
+                    onTap: onListen,
+                    behavior: HitTestBehavior.opaque,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 7,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.play_arrow_rounded,
-                            size: 16,
-                            color: Colors.white,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.28),
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            switch (languageCode) {
-                              'ar' => 'استمع الآن',
-                              'so' => 'Dhageyso hadda',
-                              _ => 'Listen now',
-                            },
-                            style: AppTheme.sans(
-                              fontSize: 12,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.play_arrow_rounded,
+                              size: 16,
                               color: Colors.white,
-                              weight: FontWeight.w700,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              switch (languageCode) {
+                                'ar' => 'استمع الآن',
+                                'so' => 'Dhageyso hadda',
+                                _ => 'Listen now',
+                              },
+                              style: AppTheme.sans(
+                                fontSize: 12,
+                                color: Colors.white,
+                                weight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -650,8 +696,11 @@ class _ReciterRow extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right_rounded,
-                  size: 22, color: Color(0xFFCBD5D1)),
+              const Icon(
+                Icons.chevron_right_rounded,
+                size: 22,
+                color: Color(0xFFCBD5D1),
+              ),
             ],
           ),
         ),
@@ -673,8 +722,8 @@ class _SavedSurahRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = track.surah?.localizedName(languageCode) ??
-        'Surah ${track.surahId}';
+    final name =
+        track.surah?.localizedName(languageCode) ?? 'Surah ${track.surahId}';
     final arabic = track.surah?.nameArabic ?? '';
     final number = track.surah?.number ?? track.surahId;
 

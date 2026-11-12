@@ -54,5 +54,19 @@
   "deleteAccount": "Tirtir akoonka",
   "privacyPolicy": "Siyaasadda sirta",
   "rateTheApp": "Qiimee app-ka",
-  "forSomaliCommunity": "Ujeedo: beesha Soomaaliyeed"
+  "forSomaliCommunity": "Ujeedo: beesha Soomaaliyeed",
+  "onboardingWelcomeTitle": "Kusoo dhawoow Xulka Quraada",
+  "onboardingWelcomeBody": "Dhageyso quraaada Soomaaliyeed, raac aayadda, oo kaydi waxa aad jeceshahay.",
+  "onboardingRecitersTitle": "Quraa la doortay",
+  "onboardingRecitersBody": "Ka dooro qaari, gobol, ama suurad, kadibna bilow tilaawada.",
+  "onboardingFollowTitle": "Raac aayadda",
+  "onboardingFollowBody": "Marka codku socdo, aayadda Carabiga ah ayaa la iftiiminayaa.",
+  "onboardingMomentsTitle": "Moments",
+  "onboardingMomentsBody": "Daawo muuqaalo gaagaaban, kadibna jeclow, kaydi, ama faallo ka bixi.",
+  "onboardingNotificationsTitle": "Ogeysiisyada",
+  "onboardingNotificationsBody": "Oggolow ogeysiisyada si kontaroolada codka ay ugu muuqdaan shaashadda xiran.",
+  "onboardingNext": "Sii wad",
+  "onboardingSkip": "Ka bood",
+  "onboardingAllow": "Oggolow",
+  "onboardingNotNow": "Hadda ma aha"
 }

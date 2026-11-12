@@ -5,7 +5,9 @@ import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
 import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/locale/locale_controller.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
+import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/about/about_screen.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
 import 'package:qaari_sl_mobile/features/downloads/downloads_screen.dart';
@@ -40,14 +42,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     return Column(
       children: [
-        ForestPageHeader(
-          title: l10n.settings,
-        ),
+        ForestPageHeader(title: l10n.settings),
         Expanded(
           child: ColoredBox(
             color: AppColors.cream,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+              padding: EdgeInsets.fromLTRB(
+                20,
+                18,
+                20,
+                ShellMetrics.overlayHeight(
+                  safeBottom: MediaQuery.paddingOf(context).bottom,
+                  player: ref.watch(playerControllerProvider).current != null,
+                ),
+              ),
               children: [
                 _SectionLabel(l10n.language),
                 _GroupedCard(
@@ -281,10 +289,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Text(
                   '${AppConstants.appName} ${_versionLabel.isEmpty ? '' : '$_versionLabel '}· ${l10n.forSomaliCommunity}',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontSize: 11,
-                  ),
+                  style: const TextStyle(color: AppColors.muted, fontSize: 11),
                 ),
               ],
             ),
@@ -318,9 +323,7 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
             TextField(
               controller: passwordController,
               obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Confirm password',
-              ),
+              decoration: const InputDecoration(labelText: 'Confirm password'),
             ),
           ],
         ),
@@ -346,9 +349,9 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
     return;
   }
 
-  final ok = await ref.read(authControllerProvider.notifier).deleteAccount(
-        password: passwordController.text,
-      );
+  final ok = await ref
+      .read(authControllerProvider.notifier)
+      .deleteAccount(password: passwordController.text);
   passwordController.dispose();
 
   if (!context.mounted) return;
@@ -359,7 +362,7 @@ Future<void> _confirmDeleteAccount(BuildContext context, WidgetRef ref) async {
         ok
             ? 'Your account has been deleted.'
             : (ref.read(authControllerProvider).error ??
-                'Could not delete account.'),
+                  'Could not delete account.'),
       ),
     ),
   );

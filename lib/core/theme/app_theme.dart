@@ -1,63 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_palette.dart';
 
 abstract final class AppTheme {
-  static ThemeData get light {
-    final sans = GoogleFonts.plusJakartaSansTextTheme();
+  static ThemeData get dark => _build(AppPalette.dark);
 
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.cream,
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.forest,
-        onPrimary: AppColors.cream,
-        secondary: AppColors.gold,
-        onSecondary: AppColors.deep,
-        surface: AppColors.creamCard,
-        onSurface: AppColors.ink,
-        outline: AppColors.border,
-      ),
+  static ThemeData get light => _build(AppPalette.light);
+
+  static ThemeData _build(AppPalette palette) {
+    final base = ThemeData(useMaterial3: true, brightness: palette.brightness);
+    final sans = GoogleFonts.interTextTheme(
+      base.textTheme,
+    ).apply(bodyColor: palette.text, displayColor: palette.text);
+
+    return base.copyWith(
+      scaffoldBackgroundColor: palette.bg,
+      extensions: [palette],
+      textTheme: sans,
+      colorScheme:
+          ColorScheme.fromSeed(
+            seedColor: palette.brand,
+            brightness: palette.brightness,
+          ).copyWith(
+            primary: palette.primary,
+            onPrimary: palette.onPrimary,
+            secondary: palette.accent,
+            onSecondary: palette.bgDeep,
+            surface: palette.surface,
+            onSurface: palette.text,
+            error: palette.danger,
+            onError: palette.bg,
+            outline: palette.line,
+          ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.cream,
-        foregroundColor: AppColors.ink,
+        backgroundColor: palette.bg,
+        foregroundColor: palette.text,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         titleTextStyle: displayFont(
           fontSize: 22,
+          color: palette.text,
           weight: FontWeight.w600,
         ),
       ),
-      textTheme: sans.apply(
-        bodyColor: AppColors.ink,
-        displayColor: AppColors.ink,
-      ),
       cardTheme: CardThemeData(
-        color: AppColors.creamCard,
+        color: palette.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(22),
+          side: BorderSide(color: palette.line),
         ),
       ),
-      dividerColor: AppColors.border,
+      dividerColor: palette.line,
+      iconTheme: IconThemeData(color: palette.text),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.creamCard,
+        fillColor: palette.surface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: palette.line),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: palette.line),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
-          borderSide: const BorderSide(color: AppColors.gold, width: 1.2),
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide(color: palette.accent, width: 1.2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
       ),
     );
   }
@@ -67,12 +83,14 @@ abstract final class AppTheme {
     Color color = AppColors.ink,
     FontWeight weight = FontWeight.w600,
     double height = 1.15,
+    double letterSpacing = 0,
   }) {
-    return GoogleFonts.cormorantGaramond(
+    return GoogleFonts.fraunces(
       fontSize: fontSize,
       color: color,
       fontWeight: weight,
       height: height,
+      letterSpacing: letterSpacing,
     );
   }
 
@@ -81,12 +99,14 @@ abstract final class AppTheme {
     Color color = AppColors.ink,
     FontWeight weight = FontWeight.w500,
     double height = 1.35,
+    double letterSpacing = 0,
   }) {
-    return GoogleFonts.plusJakartaSans(
+    return GoogleFonts.inter(
       fontSize: fontSize,
       color: color,
       fontWeight: weight,
       height: height,
+      letterSpacing: letterSpacing,
     );
   }
 

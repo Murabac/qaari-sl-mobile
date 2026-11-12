@@ -54,5 +54,19 @@
   "deleteAccount": "Delete account",
   "privacyPolicy": "Privacy policy",
   "rateTheApp": "Rate the App",
-  "forSomaliCommunity": "For the Somali community"
+  "forSomaliCommunity": "For the Somali community",
+  "onboardingWelcomeTitle": "Welcome to Xulka Quraada",
+  "onboardingWelcomeBody": "Listen to Somali reciters, follow the ayah, and save what you love.",
+  "onboardingRecitersTitle": "Chosen reciters",
+  "onboardingRecitersBody": "Pick a reciter, a region, or a surah, then start the recitation.",
+  "onboardingFollowTitle": "Follow the ayah",
+  "onboardingFollowBody": "While the recitation plays, the Arabic ayah is highlighted.",
+  "onboardingMomentsTitle": "Moments",
+  "onboardingMomentsBody": "Watch short clips, then like, save, or leave a short comment.",
+  "onboardingNotificationsTitle": "Notifications",
+  "onboardingNotificationsBody": "Allow notifications so the playback controls can appear on the lock screen.",
+  "onboardingNext": "Next",
+  "onboardingSkip": "Skip",
+  "onboardingAllow": "Allow",
+  "onboardingNotNow": "Not now"
 }

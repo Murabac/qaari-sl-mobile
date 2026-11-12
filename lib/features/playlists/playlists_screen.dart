@@ -4,7 +4,9 @@ import 'package:qaari_sl_mobile/core/auth/auth_controller.dart';
 import 'package:qaari_sl_mobile/core/data/library_repository.dart';
 import 'package:qaari_sl_mobile/core/models/playlist.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
+import 'package:qaari_sl_mobile/core/theme/app_metrics.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
+import 'package:qaari_sl_mobile/features/player/player_controller.dart';
 import 'package:qaari_sl_mobile/features/auth/login_screen.dart';
 import 'package:qaari_sl_mobile/features/playlists/playlist_detail_screen.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
@@ -78,7 +80,10 @@ class PlaylistsScreen extends ConsumerWidget {
                           style: FilledButton.styleFrom(
                             backgroundColor: const Color(0xFFC6A15B),
                             foregroundColor: AppColors.deep,
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 12,
+                            ),
                             shape: const StadiumBorder(),
                           ),
                           child: const Text('Log in'),
@@ -125,7 +130,17 @@ class PlaylistsScreen extends ConsumerWidget {
                         onRefresh: () async =>
                             ref.invalidate(playlistsProvider),
                         child: ListView.separated(
-                          padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                          padding: EdgeInsets.fromLTRB(
+                            20,
+                            18,
+                            20,
+                            ShellMetrics.overlayHeight(
+                              safeBottom: MediaQuery.paddingOf(context).bottom,
+                              player:
+                                  ref.watch(playerControllerProvider).current !=
+                                  null,
+                            ),
+                          ),
                           itemCount: playlists.length,
                           separatorBuilder: (_, _) =>
                               const SizedBox(height: 14),
@@ -292,8 +307,10 @@ class _PlaylistCard extends StatelessWidget {
               ),
               for (final item in preview)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   decoration: const BoxDecoration(
                     border: Border(top: BorderSide(color: AppColors.cream)),
                   ),
@@ -335,8 +352,10 @@ class _PlaylistCard extends StatelessWidget {
               if (playlist.itemsCount > preview.length)
                 Container(
                   width: double.infinity,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: const BoxDecoration(
                     border: Border(top: BorderSide(color: AppColors.cream)),
                   ),

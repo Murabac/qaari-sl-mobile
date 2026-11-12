@@ -10,8 +10,8 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
     ),
   );
 
@@ -19,9 +19,7 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [
-        audioHandlerProvider.overrideWithValue(audioHandler),
-      ],
+      overrides: [audioHandlerProvider.overrideWithValue(audioHandler)],
       child: const QaariSlApp(),
     ),
   );

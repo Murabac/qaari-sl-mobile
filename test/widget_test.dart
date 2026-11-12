@@ -12,8 +12,13 @@ import 'package:qaari_sl_mobile/core/models/reciter.dart';
 import 'package:qaari_sl_mobile/core/models/surah.dart';
 import 'package:qaari_sl_mobile/core/models/recitation.dart';
 import 'package:qaari_sl_mobile/core/network/api_client.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:qaari_sl_mobile/features/player/audio_handler.dart';
+import 'package:qaari_sl_mobile/features/player/open_player.dart';
+import 'package:qaari_sl_mobile/core/theme/theme_mode_controller.dart';
+import 'package:qaari_sl_mobile/features/onboarding/onboarding_store.dart';
 import 'package:qaari_sl_mobile/features/player/player_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   test('Surah and Reciter parse API JSON', () {
@@ -125,7 +130,19 @@ void main() {
     expect(controller.state, const Locale('en'));
   });
 
+  test('ThemeModeController defaults to dark', () {
+    final controller = ThemeModeController(autoLoad: false);
+    expect(controller.state, ThemeMode.dark);
+    controller.applyCode('light');
+    expect(controller.state, ThemeMode.light);
+    controller.applyCode('system');
+    expect(controller.state, ThemeMode.system);
+    controller.applyCode('nope');
+    expect(controller.state, ThemeMode.system);
+  });
+
   testWidgets('Qaari SL app boots to home shell', (tester) async {
+    SharedPreferences.setMockInitialValues({OnboardingStore.prefsKey: true});
     final handler = QaariAudioHandler();
 
     await tester.pumpWidget(
@@ -150,7 +167,104 @@ void main() {
 
     expect(find.text('Qaariyada la soo bandhigay'), findsOneWidget);
     expect(find.text('Demo'), findsWidgets);
+    expect(find.text('Dhageyso hadda'), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
+  });
+
+  testWidgets('first launch tours the app then asks for notifications', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final handler = QaariAudioHandler();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          audioHandlerProvider.overrideWithValue(handler),
+          catalogRepositoryProvider.overrideWithValue(_FakeCatalog()),
+          tokenStoreProvider.overrideWithValue(_MemoryTokenStore(null)),
+          authRepositoryProvider.overrideWithValue(_GuestAuthRepository()),
+          localeControllerProvider.overrideWith(
+            (ref) => LocaleController(autoLoad: false),
+          ),
+        ],
+        child: const QaariSlApp(),
+      ),
+    );
+
+    await tester.pump(const Duration(milliseconds: 1800));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Kusoo dhawoow Xulka Quraada'), findsOneWidget);
+    expect(find.text('Ka bood'), findsOneWidget);
+
+    await tester.tap(find.text('Ka bood'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ogeysiisyada'), findsOneWidget);
+    expect(find.text('Oggolow'), findsOneWidget);
+    expect(find.text('Hadda ma aha'), findsOneWidget);
+
+    await tester.tap(find.text('Hadda ma aha'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Dhageyso hadda'), findsOneWidget);
+    expect(find.text('Home'), findsOneWidget);
+
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getBool(OnboardingStore.prefsKey), isTrue);
+  });
+
+  test('finished playback restarts from the beginning', () {
+    expect(playbackNeedsRestart(ProcessingState.completed), isTrue);
+    expect(playbackNeedsRestart(ProcessingState.ready), isFalse);
+    expect(playbackNeedsRestart(ProcessingState.idle), isFalse);
+  });
+
+  test('Listen now uses loaded tracks before fetching the profile', () async {
+    final listed = Reciter.fromJson({
+      'id': 1,
+      'name_somali': 'Demo',
+      'name_arabic': '',
+      'name_english': 'Demo',
+      'bio_somali': '',
+      'bio_arabic': '',
+      'bio_english': '',
+      'photo_url': null,
+      'region': 'Harar',
+      'approved_recitations_count': 1,
+      'recitations': [
+        {
+          'id': 9,
+          'reciter_id': 1,
+          'surah_id': 1,
+          'audio_url': 'https://example.com/ready.mp3',
+          'duration': 30,
+          'file_size': 10,
+        },
+      ],
+    });
+    final catalog = _QueueCatalog();
+    final queue = await resolveListenQueue(listed, catalog);
+    expect(queue, hasLength(1));
+    expect(queue.first.id, 9);
+    expect(catalog.fetched, isFalse);
+
+    final bare = Reciter.fromJson({
+      'id': 2,
+      'name_somali': 'Bare',
+      'name_arabic': '',
+      'name_english': 'Bare',
+      'bio_somali': '',
+      'bio_arabic': '',
+      'bio_english': '',
+      'photo_url': null,
+      'region': null,
+      'approved_recitations_count': 1,
+    });
+    final loaded = await resolveListenQueue(bare, catalog);
+    expect(catalog.fetched, isTrue);
+    expect(loaded.single.audioUrl, 'https://example.com/fetched.mp3');
   });
 }
 
@@ -171,7 +285,7 @@ class _MemoryTokenStore extends TokenStore {
 
 class _GuestAuthRepository extends AuthRepository {
   _GuestAuthRepository()
-      : super(dio: Dio(), tokenStore: _MemoryTokenStore(null));
+    : super(dio: Dio(), tokenStore: _MemoryTokenStore(null));
 
   @override
   Future<String?> readToken() async => null;
@@ -181,6 +295,37 @@ class _GuestAuthRepository extends AuthRepository {
 
   @override
   Future<void> logout() async {}
+}
+
+class _QueueCatalog extends _FakeCatalog {
+  var fetched = false;
+
+  @override
+  Future<Reciter> fetchReciter(int id) async {
+    fetched = true;
+    return Reciter.fromJson({
+      'id': id,
+      'name_somali': 'Bare',
+      'name_arabic': '',
+      'name_english': 'Bare',
+      'bio_somali': '',
+      'bio_arabic': '',
+      'bio_english': '',
+      'photo_url': null,
+      'region': null,
+      'approved_recitations_count': 1,
+      'recitations': [
+        {
+          'id': 4,
+          'reciter_id': id,
+          'surah_id': 1,
+          'audio_url': 'https://example.com/fetched.mp3',
+          'duration': 12,
+          'file_size': 10,
+        },
+      ],
+    });
+  }
 }
 
 class _FakeCatalog extends CatalogRepository {

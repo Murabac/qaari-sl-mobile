@@ -193,21 +193,27 @@ class _MomentsScreenState extends ConsumerState<MomentsScreen> {
     }
   }
 
-  Future<void> _openComments(Moment moment) async {
-    final delta = await showModalBottomSheet<int>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.cream,
-      builder: (context) => _CommentsSheet(momentId: moment.id),
-    );
-    if (!mounted || delta == null || delta == 0) return;
-    final index = _items.indexWhere((item) => item.id == moment.id);
+  void _adjustCommentCount(int momentId, int delta) {
+    if (!mounted || delta == 0) return;
+    final index = _items.indexWhere((item) => item.id == momentId);
     if (index < 0) return;
     setState(() {
       _items[index] = _items[index].copyWith(
         commentsCount: (_items[index].commentsCount + delta).clamp(0, 1 << 30),
       );
     });
+  }
+
+  Future<void> _openComments(Moment moment) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.cream,
+      builder: (context) => _CommentsSheet(
+        momentId: moment.id,
+        onChanged: (delta) => _adjustCommentCount(moment.id, delta),
+      ),
+    );
   }
 
   void _onScroll() {
@@ -605,6 +611,7 @@ class _MomentCard extends StatefulWidget {
 
 class _MomentCardState extends State<_MomentCard> {
   VideoPlayerController? _controller;
+  var _generation = 0;
   var _ready = false;
   var _failed = false;
   var _expanded = false;
@@ -635,6 +642,12 @@ class _MomentCardState extends State<_MomentCard> {
     }
   }
 
+  bool _owns(VideoPlayerController controller, int generation) {
+    return mounted &&
+        generation == _generation &&
+        identical(_controller, controller);
+  }
+
   Future<void> _open() async {
     if (_controller != null) {
       await _play();
@@ -645,28 +658,36 @@ class _MomentCardState extends State<_MomentCard> {
       if (mounted) setState(() => _failed = true);
       return;
     }
+    final generation = _generation;
     final controller = VideoPlayerController.networkUrl(Uri.parse(url));
     _controller = controller;
     try {
       await controller.initialize();
+      if (!_owns(controller, generation)) return;
       await controller.setLooping(true);
+      if (!_owns(controller, generation)) return;
       await controller.setVolume(widget.muted ? 0 : 1);
-      if (!mounted || !widget.active) {
+      if (!_owns(controller, generation)) return;
+      if (!widget.active) {
         await controller.pause();
         return;
       }
       setState(() => _ready = true);
+      if (!_owns(controller, generation)) return;
       await controller.play();
     } catch (_) {
-      if (!mounted) return;
+      if (!_owns(controller, generation)) return;
       setState(() => _failed = true);
     }
   }
 
   Future<void> _play() async {
     final controller = _controller;
+    final generation = _generation;
     if (controller == null || !controller.value.isInitialized) return;
+    if (!_owns(controller, generation)) return;
     await controller.setVolume(widget.muted ? 0 : 1);
+    if (!_owns(controller, generation)) return;
     if (widget.active) {
       await controller.play();
     } else {
@@ -675,10 +696,12 @@ class _MomentCardState extends State<_MomentCard> {
   }
 
   void _close() {
-    _controller?.dispose();
+    _generation++;
+    final controller = _controller;
     _controller = null;
     _ready = false;
     _failed = false;
+    controller?.dispose();
   }
 
   @override
@@ -1048,9 +1071,10 @@ class _Action extends StatelessWidget {
 }
 
 class _CommentsSheet extends ConsumerStatefulWidget {
-  const _CommentsSheet({required this.momentId});
+  const _CommentsSheet({required this.momentId, required this.onChanged});
 
   final int momentId;
+  final ValueChanged<int> onChanged;
 
   @override
   ConsumerState<_CommentsSheet> createState() => _CommentsSheetState();
@@ -1060,7 +1084,6 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
   final _body = TextEditingController();
   List<MomentComment> _comments = const [];
   var _loading = true;
-  var _delta = 0;
 
   @override
   void initState() {
@@ -1105,9 +1128,9 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
       if (!mounted) return;
       setState(() {
         _comments = [created, ..._comments];
-        _delta += 1;
         _body.clear();
       });
+      widget.onChanged(1);
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1126,8 +1149,8 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
       if (!mounted) return;
       setState(() {
         _comments = _comments.where((item) => item.id != comment.id).toList();
-        _delta -= 1;
       });
+      widget.onChanged(-1);
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1164,7 +1187,7 @@ class _CommentsSheetState extends ConsumerState<_CommentsSheet> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.of(context).pop(_delta),
+                      onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close),
                     ),
                   ],

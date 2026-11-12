@@ -1,3 +1,26 @@
+/// Space the floating nav and mini player occupy over a tab page.
+abstract final class ShellMetrics {
+  static const double navHeight = 64;
+  static const double playerHeight = 64;
+  static const double gap = 10;
+  static const double side = 16;
+
+  static double navBottom(double safeBottom) {
+    final safe = safeBottom < 12 ? 12.0 : safeBottom;
+    return safe + 10;
+  }
+
+  static double overlayHeight({
+    required double safeBottom,
+    required bool player,
+  }) {
+    return navBottom(safeBottom) +
+        navHeight +
+        (player ? gap + playerHeight : 0) +
+        12;
+  }
+}
+
 /// Shared layout numbers for the public listener screens.
 abstract final class AppSpacing {
   static const double page = 20;

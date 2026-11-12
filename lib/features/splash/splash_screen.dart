@@ -3,6 +3,8 @@ import 'package:qaari_sl_mobile/core/constants/app_constants.dart';
 import 'package:qaari_sl_mobile/core/theme/app_colors.dart';
 import 'package:qaari_sl_mobile/core/theme/app_theme.dart';
 import 'package:qaari_sl_mobile/features/home/home_shell.dart';
+import 'package:qaari_sl_mobile/features/onboarding/onboarding_screen.dart';
+import 'package:qaari_sl_mobile/features/onboarding/onboarding_store.dart';
 import 'package:qaari_sl_mobile/shared/widgets/widgets.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -23,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     )..repeat();
-    Future<void>.delayed(const Duration(milliseconds: 1600), _goHome);
+    _leave();
   }
 
   @override
@@ -32,10 +34,15 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  void _goHome() {
+  Future<void> _leave() async {
+    final done = OnboardingStore.isComplete();
+    await Future<void>.delayed(const Duration(milliseconds: 1600));
+    final complete = await done;
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute<void>(builder: (_) => const HomeShell()),
+      MaterialPageRoute<void>(
+        builder: (_) => complete ? const HomeShell() : const OnboardingScreen(),
+      ),
     );
   }
 

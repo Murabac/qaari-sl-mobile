@@ -173,4 +173,51 @@ class AppLocalizationsSo extends AppLocalizations {
 
   @override
   String get forSomaliCommunity => 'Ujeedo: beesha Soomaaliyeed';
+
+  @override
+  String get onboardingWelcomeTitle => 'Kusoo dhawoow Xulka Quraada';
+
+  @override
+  String get onboardingWelcomeBody =>
+      'Dhageyso quraaada Soomaaliyeed, raac aayadda, oo kaydi waxa aad jeceshahay.';
+
+  @override
+  String get onboardingRecitersTitle => 'Quraa la doortay';
+
+  @override
+  String get onboardingRecitersBody =>
+      'Ka dooro qaari, gobol, ama suurad, kadibna bilow tilaawada.';
+
+  @override
+  String get onboardingFollowTitle => 'Raac aayadda';
+
+  @override
+  String get onboardingFollowBody =>
+      'Marka codku socdo, aayadda Carabiga ah ayaa la iftiiminayaa.';
+
+  @override
+  String get onboardingMomentsTitle => 'Moments';
+
+  @override
+  String get onboardingMomentsBody =>
+      'Daawo muuqaalo gaagaaban, kadibna jeclow, kaydi, ama faallo ka bixi.';
+
+  @override
+  String get onboardingNotificationsTitle => 'Ogeysiisyada';
+
+  @override
+  String get onboardingNotificationsBody =>
+      'Oggolow ogeysiisyada si kontaroolada codka ay ugu muuqdaan shaashadda xiran.';
+
+  @override
+  String get onboardingNext => 'Sii wad';
+
+  @override
+  String get onboardingSkip => 'Ka bood';
+
+  @override
+  String get onboardingAllow => 'Oggolow';
+
+  @override
+  String get onboardingNotNow => 'Hadda ma aha';
 }

@@ -429,6 +429,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'For the Somali community'**
   String get forSomaliCommunity;
+
+  /// No description provided for @onboardingWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Xulka Quraada'**
+  String get onboardingWelcomeTitle;
+
+  /// No description provided for @onboardingWelcomeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Listen to Somali reciters, follow the ayah, and save what you love.'**
+  String get onboardingWelcomeBody;
+
+  /// No description provided for @onboardingRecitersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chosen reciters'**
+  String get onboardingRecitersTitle;
+
+  /// No description provided for @onboardingRecitersBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a reciter, a region, or a surah, then start the recitation.'**
+  String get onboardingRecitersBody;
+
+  /// No description provided for @onboardingFollowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the ayah'**
+  String get onboardingFollowTitle;
+
+  /// No description provided for @onboardingFollowBody.
+  ///
+  /// In en, this message translates to:
+  /// **'While the recitation plays, the Arabic ayah is highlighted.'**
+  String get onboardingFollowBody;
+
+  /// No description provided for @onboardingMomentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moments'**
+  String get onboardingMomentsTitle;
+
+  /// No description provided for @onboardingMomentsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch short clips, then like, save, or leave a short comment.'**
+  String get onboardingMomentsBody;
+
+  /// No description provided for @onboardingNotificationsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get onboardingNotificationsTitle;
+
+  /// No description provided for @onboardingNotificationsBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications so the playback controls can appear on the lock screen.'**
+  String get onboardingNotificationsBody;
+
+  /// No description provided for @onboardingNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get onboardingNext;
+
+  /// No description provided for @onboardingSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get onboardingSkip;
+
+  /// No description provided for @onboardingAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get onboardingAllow;
+
+  /// No description provided for @onboardingNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get onboardingNotNow;
 }
 
 class _AppLocalizationsDelegate
