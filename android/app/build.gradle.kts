@@ -25,10 +25,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
     defaultConfig {
         applicationId = "com.xulkaquraada.mobile"
         minSdk = flutter.minSdkVersion
@@ -62,6 +58,18 @@ android {
                 "proguard-rules.pro",
             )
         }
+    }
+
+    // AGP 9 lintVital crashes on Java 17 (List.removeLast). Skip it for release bundles.
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
